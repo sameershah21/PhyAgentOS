@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.png" alt="OpenEmbodiedAgent" width="400">
+  <img src="logo.png" alt="OpenEmbodiedAgent" width="600">
   <h1>OpenEmbodiedAgent (OEA)</h1>
   <p><b>A Consumer-Grade Embodied AI Framework Based on Constraint Solving and Multi-Agent Collaboration</b></p>
   <p>
