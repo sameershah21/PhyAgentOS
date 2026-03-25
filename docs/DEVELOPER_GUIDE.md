@@ -76,11 +76,14 @@ All inter-module communication happens through `.md` files in the workspace dire
 Each robot embodiment implements the `BaseDriver` abstract class. Drivers are loaded dynamically via `--driver` CLI parameter. A driver developer only touches files inside `hal/drivers/` and `hal/profiles/`.
 
 ### 3.3 Profile is Switch
-Each robot body has an `EMBODIED.md` profile under `hal/profiles/`. When the watchdog starts with `--driver <name>`, it copies the matching profile to the workspace as `EMBODIED.md`.
+Each robot body has a concrete profile under `hal/profiles/`. The `OEA/templates/EMBODIED.md` file is only a structural template explaining what sections `EMBODIED.md` should contain. In single mode the watchdog copies the matching concrete profile to the active workspace. In fleet mode each watchdog copies it into that robot instance's own workspace.
 
-### 3.4 OEA is Core
+### 3.4 Shared Workspace + Robot Workspaces
+Single mode keeps the single `~/.OEA/workspace` layout. Fleet mode uses one shared workspace for the Agent and global Markdown state, plus one robot-local workspace per embodied instance for `ACTION.md` and `EMBODIED.md`.
+
+### 3.5 OEA is Core
 We do NOT fork OEA. We extend it by:
-- Adding templates to `OEA/templates/`
+- Adding protocol templates to `OEA/templates/`
 - Adding tools to `OEA/agent/tools/`
 - The agent context (`context.py`) loads all workspace `.md` files as bootstrap context
 
@@ -184,6 +187,8 @@ Semantic navigation actions use the same fenced JSON shape:
 
 Structured `oea.environment.v1` documents may also include:
 
+- `robots.<robot_id>.connection_state` for connection health and reconnect metadata
+
 - `scene_graph` for semantic nodes and relations
 - `robots.<robot_id>.robot_pose` for localization state
 - `robots.<robot_id>.nav_state` for navigation task state
@@ -217,12 +222,12 @@ OpenEmbodiedAgent (OEA) 是一个消费级具身智能框架，使用 **Markdown
 每种机器人硬件实现 `BaseDriver` 抽象类。驱动通过 `--driver` CLI 参数动态加载。驱动开发者只需修改 `hal/drivers/` 和 `hal/profiles/` 中的文件。
 
 ### 3.3 Profile 即切换
-每种机器人本体在 `hal/profiles/` 下有一个 `EMBODIED.md` 档案。当看门狗 (`hal_watchdog.py`) 以 `--driver <名称>` 启动时，会自动将对应档案复制到工作区作为 `EMBODIED.md`。
+每种机器人本体在 `hal/profiles/` 下有自己的具体 profile。`OEA/templates/EMBODIED.md` 只负责说明 `EMBODIED.md` 应有哪些 section 和协议含义，不承载具体机器人参数。当看门狗 (`hal_watchdog.py`) 启动时，会把匹配的具体 profile 复制到运行时工作区作为 `EMBODIED.md`。
 
-### 3.4 nanobot 是核心
-我们**不 fork nanobot**，而是通过以下方式扩展它：
-- 向 `nanobot/templates/` 添加模板
-- 向 `nanobot/agent/tools/` 添加工具
+### 3.4 OEA 是核心
+我们**不 fork OEA**，而是通过以下方式扩展它：
+- 向 `OEA/templates/` 添加协议模板
+- 向 `OEA/agent/tools/` 添加工具
 - Agent 上下文 (`context.py`) 自动加载工作区中所有 `.md` 文件作为引导上下文
 
 ## 4. 开发轨道

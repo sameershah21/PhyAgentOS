@@ -25,7 +25,7 @@
 🪶 **万物皆 Markdown**: 软硬件通过读写本地 Markdown 文件（如 `ENVIRONMENT.md`, `ACTION.md`）进行通信，彻底解耦，极度透明。
 
 🧠 **双轨多体系统**:
-- **Track A (大脑)**: 包含 Planner (规划) 与 Critic (校验) 机制。大模型不直接下发指令，必须经过 Critic 对照物理极限（`EMBODIED.md`）校验后才落盘。
+- **Track A (大脑)**: 包含 Planner (规划) 与 Critic (校验) 机制。大模型不直接下发指令，必须经过 Critic 对照当前机器人运行时 `EMBODIED.md`（由 profile 复制而来）的能力约束校验后才落盘。
 - **Track B (小脑)**: 独立的硬件看门狗 (`hal_watchdog.py`) 监听指令并执行。
 
 🛡️ **Anti-Shitstorm 机制**: 严格的动作校验与 `LESSONS.md` 经验避坑库，防止 Agent 工作流失控。
@@ -97,7 +97,8 @@ python scripts/deploy_rekep_real_plugin.py \
 ```bash
 OEA onboard
 ```
-这将在 `~/.OEA/workspace/` 下生成核心的 Markdown 协议文件（`EMBODIED.md`, `ENVIRONMENT.md` 等）。
+这会在当前工作区生成核心 Markdown 协议文件。
+单实例模式默认使用 `~/.OEA/workspace/`；fleet 模式会使用 `~/.OEA/workspaces/` 下的 shared 工作区和多个机器人工作区。
 
 ### 3. 启动系统
 
@@ -132,19 +133,23 @@ OEA agent
 OpenEmbodiedAgent/
 ├── OEA/                # Track A: 软件大脑核心 (基于 OEA 扩展)
 │   ├── agent/              # Agent 逻辑 (Planner, Critic)
-│   ├── templates/          # Workspace Markdown 模板
+│   ├── templates/          # Workspace Markdown 模板（只定义协议结构）
 │   └── ...
 ├── hal/                    # Track B: 硬件小脑与仿真 (新增)
 │   ├── hal_watchdog.py     # 硬件看门狗守护进程
 │   └── simulation/         # 仿真环境相关代码
 ├── scripts/                # 外部 HAL 插件部署脚本
 │   └── deploy_rekep_real_plugin.py
-├── workspace/              # 运行时生成的工作区 (Workspace API)
-│   ├── EMBODIED.md         # 机器人本体能力声明
+├── workspace/              # 单实例运行时工作区（兼容默认模式）
+│   ├── EMBODIED.md         # 从 hal/profiles/ 复制来的运行时机器人 profile
 │   ├── ENVIRONMENT.md      # 当前环境 Scene-Graph
 │   ├── ACTION.md           # 待执行的动作指令
 │   ├── LESSONS.md          # 失败经验记录
 │   └── SKILL.md            # 成功工作流 SOP
+├── workspaces/             # fleet 模式拓扑
+│   ├── shared/             # Agent 工作区与全局 ENVIRONMENT.md
+│   ├── go2_edu_001/        # 机器人本地 ACTION.md / EMBODIED.md
+│   └── ...
 ├── docs/                   # 项目文档
 │   ├── PLAN.md             # 详细实施方案
 │   └── PROJ.md             # 项目白皮书与架构设计
