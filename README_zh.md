@@ -86,6 +86,10 @@ cd OpenEmbodiedAgent
 pip install -e .
 # 安装仿真环境依赖 (如 watchdog)
 pip install watchdog
+
+# 可选：安装外部 ReKep 真机插件
+python scripts/deploy_rekep_real_plugin.py \
+  --repo-url https://github.com/baiyu858/oea-rekep-real-plugin.git
 ```
 
 ### 2. 初始化工作区
@@ -102,6 +106,12 @@ OEA onboard
 **终端 1: 启动硬件看门狗与仿真环境 (Track B)**
 ```bash
 python hal/hal_watchdog.py
+```
+
+如果要使用真机 ReKep 而不是仿真，请先安装插件，再执行：
+
+```bash
+python hal/hal_watchdog.py --driver rekep_real
 ```
 
 **终端 2: 启动大脑 Agent (Track A)**
@@ -127,6 +137,8 @@ OpenEmbodiedAgent/
 ├── hal/                    # Track B: 硬件小脑与仿真 (新增)
 │   ├── hal_watchdog.py     # 硬件看门狗守护进程
 │   └── simulation/         # 仿真环境相关代码
+├── scripts/                # 外部 HAL 插件部署脚本
+│   └── deploy_rekep_real_plugin.py
 ├── workspace/              # 运行时生成的工作区 (Workspace API)
 │   ├── EMBODIED.md         # 机器人本体能力声明
 │   ├── ENVIRONMENT.md      # 当前环境 Scene-Graph

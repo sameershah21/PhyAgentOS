@@ -121,9 +121,18 @@ pip install -e .
 # Run with simulation driver (default)
 python hal/hal_watchdog.py --driver simulation
 
+# Install the external ReKep plugin
+python scripts/deploy_rekep_real_plugin.py \
+  --repo-url https://github.com/baiyu858/oea-rekep-real-plugin.git
+
+# Run with real ReKep driver
+python hal/hal_watchdog.py --driver rekep_real
+
 # In another terminal, start the brain
 OEA agent
 ```
+
+ReKep real-runtime usage details now live in the plugin repository README after deployment.
 
 ## 7. Testing Contract
 
@@ -253,9 +262,18 @@ pip install -e .
 # 使用仿真驱动运行 (默认)
 python hal/hal_watchdog.py --driver simulation
 
+# 安装外部 ReKep 插件
+python scripts/deploy_rekep_real_plugin.py \
+  --repo-url https://github.com/baiyu858/oea-rekep-real-plugin.git
+
+# 使用 ReKep 真机驱动运行
+python hal/hal_watchdog.py --driver rekep_real
+
 # 在另一个终端启动大脑
-nanobot agent
+OEA agent
 ```
+
+ReKep 真机运行说明已迁移到插件仓库 README。
 
 ## 7. 测试合约
 

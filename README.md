@@ -86,6 +86,10 @@ cd OpenEmbodiedAgent
 pip install -e .
 # Install simulation dependencies (e.g., watchdog)
 pip install pybullet watchdog
+
+# Optional: install the external ReKep real-world plugin
+python scripts/deploy_rekep_real_plugin.py \
+  --repo-url https://github.com/baiyu858/oea-rekep-real-plugin.git
 ```
 
 ### 2. Initialize Workspace
@@ -102,6 +106,12 @@ You need to open two terminals:
 **Terminal 1: Start Hardware Watchdog & Simulation (Track B)**
 ```bash
 python hal/hal_watchdog.py
+```
+
+If you want the real-world ReKep embodiment instead of simulation, install the plugin first and then run:
+
+```bash
+python hal/hal_watchdog.py --driver rekep_real
 ```
 
 **Terminal 2: Start Brain Agent (Track A)**
@@ -127,6 +137,8 @@ OpenEmbodiedAgent/
 ├── hal/                    # Track B: Hardware HAL & Simulation (New)
 │   ├── hal_watchdog.py     # Hardware Watchdog Daemon
 │   └── simulation/         # Simulation Environment Code
+├── scripts/                # Deployment helpers for external HAL plugins
+│   └── deploy_rekep_real_plugin.py
 ├── workspace/              # Runtime Workspace (Workspace API)
 │   ├── EMBODIED.md         # Robot Embodiment Declaration
 │   ├── ENVIRONMENT.md      # Current Environment Scene-Graph
