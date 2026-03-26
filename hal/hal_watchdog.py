@@ -35,11 +35,11 @@ _ACTION_RE = re.compile(r"```json\s*\n(.*?)\n```", re.DOTALL)
 
 def parse_action(content: str) -> dict | None:
     """Extract the first JSON code block from ACTION.md content."""
-    m = _ACTION_RE.search(content)
-    if not m:
+    match = _ACTION_RE.search(content)
+    if not match:
         return None
     try:
-        return json.loads(m.group(1))
+        return json.loads(match.group(1))
     except json.JSONDecodeError:
         return None
 
@@ -48,7 +48,7 @@ def _load_scene(path: Path) -> dict[str, dict]:
     return load_scene_from_md(path)
 
 
-def _save_scene(driver, path: Path, scene: dict[str, dict]) -> None:
+def _save_scene(driver, path: Path, scene: dict[str, dict], registry=None) -> None:
     existing = load_environment_doc(path)
     runtime_state = {}
     runtime_getter = getattr(driver, "get_runtime_state", None)
@@ -64,6 +64,8 @@ def _save_scene(driver, path: Path, scene: dict[str, dict]) -> None:
         updated_at=datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
     )
     save_environment_doc(path, updated)
+    if registry is not None and getattr(registry, "is_fleet", False):
+        registry.write_robot_index()
 
 
 def _ensure_connection(driver) -> None:
@@ -73,11 +75,11 @@ def _ensure_connection(driver) -> None:
         connect()
 
 
-def _refresh_health(driver, env_file: Path) -> None:
+def _refresh_health(driver, env_file: Path, registry=None) -> None:
     health_check = getattr(driver, "health_check", None)
     if callable(health_check):
         health_check()
-    _save_scene(driver, env_file, driver.get_scene())
+    _save_scene(driver, env_file, driver.get_scene(), registry=registry)
 
 
 def _install_profile(driver, workspace: Path) -> None:
@@ -85,10 +87,29 @@ def _install_profile(driver, workspace: Path) -> None:
     src = driver.get_profile_path()
     dst = workspace / "EMBODIED.md"
     if src.exists():
+        workspace.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dst)
-        _log(f"Profile installed: {src.name} -> EMBODIED.md")
+        _log(f"Profile installed: {src.name} -> {dst}")
     else:
         _log(f"WARNING: profile not found at {src}")
+
+
+def _resolve_watchdog_topology(
+    workspace: Path | None,
+    driver_name: str,
+    robot_id: str | None,
+):
+    if not robot_id:
+        if workspace is None:
+            workspace = Path.home() / ".OEA" / "workspace"
+        return workspace, workspace / "ENVIRONMENT.md", driver_name, None
+
+    from OEA.config.loader import load_config
+    from OEA.embodiment_registry import EmbodimentRegistry
+
+    registry = EmbodimentRegistry(load_config())
+    instance = registry.require_instance(robot_id)
+    return instance.workspace, registry.resolve_environment_path(robot_id=robot_id), instance.driver, registry
 
 
 def watch_loop(
@@ -96,13 +117,19 @@ def watch_loop(
     driver_name: str = "simulation",
     gui: bool = False,
     poll_interval: float = 1.0,
+    *,
+    env_file: Path | None = None,
+    registry=None,
 ) -> None:
     """Load a driver, install its profile, then poll ACTION.md forever."""
     from hal.drivers import load_driver
 
+    env_file = env_file or (workspace / "ENVIRONMENT.md")
+
     _log(f"Workspace : {workspace}")
     _log(f"Driver    : {driver_name}")
     _log(f"GUI       : {gui}")
+    _log(f"Env File  : {env_file}")
 
     driver = load_driver(driver_name, gui=gui)
 
@@ -110,25 +137,24 @@ def watch_loop(
         _install_profile(driver, workspace)
         _ensure_connection(driver)
 
-        env_file = workspace / "ENVIRONMENT.md"
         scene = _load_scene(env_file)
         driver.load_scene(scene)
-        _refresh_health(driver, env_file)
+        _refresh_health(driver, env_file, registry=registry)
         _log(f"Scene loaded ({len(scene)} object(s))")
         _log("Watching ACTION.md ... Ctrl+C to stop.\n")
 
         action_file = workspace / "ACTION.md"
         try:
             while True:
-                _poll_once(driver, action_file, env_file)
+                _poll_once(driver, action_file, env_file, registry=registry)
                 time.sleep(poll_interval)
         except KeyboardInterrupt:
             _log("Shutdown.")
 
 
-def _poll_once(driver, action_file: Path, env_file: Path) -> None:
+def _poll_once(driver, action_file: Path, env_file: Path, registry=None) -> None:
     """Single poll: refresh connection state, then execute pending ACTION.md."""
-    _refresh_health(driver, env_file)
+    _refresh_health(driver, env_file, registry=registry)
 
     if not action_file.exists():
         return
@@ -150,7 +176,7 @@ def _poll_once(driver, action_file: Path, env_file: Path) -> None:
     result = driver.execute_action(action_type, params)
     _log(f"Result: {result}")
 
-    _save_scene(driver, env_file, driver.get_scene())
+    _save_scene(driver, env_file, driver.get_scene(), registry=registry)
     _log("ENVIRONMENT.md updated.")
 
     action_file.write_text("", encoding="utf-8")
@@ -170,22 +196,36 @@ def main() -> None:
     )
     parser.add_argument(
         "--workspace",
-        default=str(Path.home() / ".OEA" / "workspace"),
-        help="Workspace directory (default: ~/.OEA/workspace)",
+        default=None,
+        help="Workspace directory (single mode only; fleet mode prefers --robot-id)",
     )
+    parser.add_argument("--robot-id", default=None, help="Robot instance id in fleet mode")
     parser.add_argument("--gui", action="store_true", help="Open 3-D viewer")
     parser.add_argument(
         "--interval", type=float, default=1.0, help="Poll interval (seconds)",
     )
     args = parser.parse_args()
 
-    ws = Path(args.workspace).expanduser().resolve()
-    if not ws.exists():
-        print(f"Error: workspace not found: {ws}", file=sys.stderr)
-        print("Run 'nanobot onboard' first.", file=sys.stderr)
+    workspace = Path(args.workspace).expanduser().resolve() if args.workspace else None
+    robot_workspace, env_file, resolved_driver, registry = _resolve_watchdog_topology(
+        workspace,
+        args.driver,
+        args.robot_id,
+    )
+
+    if not robot_workspace.exists():
+        print(f"Error: workspace not found: {robot_workspace}", file=sys.stderr)
+        print("Run 'OEA onboard' first.", file=sys.stderr)
         sys.exit(1)
 
-    watch_loop(ws, driver_name=args.driver, gui=args.gui, poll_interval=args.interval)
+    watch_loop(
+        robot_workspace,
+        driver_name=resolved_driver,
+        gui=args.gui,
+        poll_interval=args.interval,
+        env_file=env_file,
+        registry=registry,
+    )
 
 
 if __name__ == "__main__":
