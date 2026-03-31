@@ -64,7 +64,7 @@ export class WhatsAppClient {
       version,
       logger,
       printQRInTerminal: false,
-      browser: ['OEA', 'cli', VERSION],
+      browser: ['PhyAgentOS', 'cli', VERSION],
       syncFullHistory: false,
       markOnlineOnConnect: false,
     });

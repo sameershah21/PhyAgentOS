@@ -2,10 +2,10 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from OEA.agent.loop import AgentLoop
-import OEA.agent.memory as memory_module
-from OEA.bus.queue import MessageBus
-from OEA.providers.base import LLMResponse
+from PhyAgentOS.agent.loop import AgentLoop
+import PhyAgentOS.agent.memory as memory_module
+from PhyAgentOS.bus.queue import MessageBus
+from PhyAgentOS.providers.base import LLMResponse
 
 
 def _make_loop(tmp_path, *, estimated_tokens: int, context_window_tokens: int) -> AgentLoop:

@@ -101,7 +101,7 @@ class TestSceneIO:
     def test_load_v1_structured_environment_returns_objects(self, tmp_path):
         p = tmp_path / "ENVIRONMENT.md"
         payload = {
-            "schema_version": "oea.environment.v1",
+            "schema_version": "PhyAgentOS.environment.v1",
             "scene_graph": {"nodes": [], "edges": []},
             "robots": {
                 "go2_edu_001": {
@@ -128,7 +128,7 @@ class TestSceneIO:
         scene = {"apple": {"position": {"x": 0, "y": 0, "z": 0}, "location": "table"}}
         save_scene_to_md(p, scene)
         doc = load_environment_doc(p)
-        assert doc.get("schema_version") == "oea.environment.v1"
+        assert doc.get("schema_version") == "PhyAgentOS.environment.v1"
         assert "objects" in doc
         assert "apple" in doc["objects"]
 
@@ -319,7 +319,7 @@ class TestWatchdogPollLoop:
 
         env_file = tmp_path / "ENVIRONMENT.md"
         initial = {
-            "schema_version": "oea.environment.v1",
+            "schema_version": "PhyAgentOS.environment.v1",
             "scene_graph": {"nodes": [], "edges": []},
             "robots": {
                 "go2_edu_001": {

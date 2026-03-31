@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from OEA.agent.loop import AgentLoop
-from OEA.agent.tools.message import MessageTool
-from OEA.bus.events import InboundMessage, OutboundMessage
-from OEA.bus.queue import MessageBus
-from OEA.providers.base import LLMResponse, ToolCallRequest
+from PhyAgentOS.agent.loop import AgentLoop
+from PhyAgentOS.agent.tools.message import MessageTool
+from PhyAgentOS.bus.events import InboundMessage, OutboundMessage
+from PhyAgentOS.bus.queue import MessageBus
+from PhyAgentOS.providers.base import LLMResponse, ToolCallRequest
 
 
 def _make_loop(tmp_path: Path) -> AgentLoop:

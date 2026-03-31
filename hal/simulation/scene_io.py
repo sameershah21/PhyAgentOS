@@ -6,7 +6,7 @@ Supported payload formats
 2. Structured envelope (v1) with an ``objects`` section:
 
      {
-         "schema_version": "oea.environment.v1",
+         "schema_version": "PhyAgentOS.environment.v1",
          "scene_graph": {...},
          "robots": {...},
          "objects": {...}
@@ -53,7 +53,7 @@ def load_environment_doc(path: Path) -> dict:
 def default_environment_doc() -> dict[str, Any]:
     """Return an empty structured environment document."""
     return {
-        "schema_version": "oea.environment.v1",
+        "schema_version": "PhyAgentOS.environment.v1",
         "scene_graph": {"nodes": [], "edges": []},
         "robots": {},
         "objects": {},

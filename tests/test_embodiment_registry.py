@@ -3,10 +3,10 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from OEA.agent.context import ContextBuilder
-from OEA.agent.tools.embodied import EmbodiedActionTool
-from OEA.config.schema import Config
-from OEA.embodiment_registry import EmbodimentRegistry
+from PhyAgentOS.agent.context import ContextBuilder
+from PhyAgentOS.agent.tools.embodied import EmbodiedActionTool
+from PhyAgentOS.config.schema import Config
+from PhyAgentOS.embodiment_registry import EmbodimentRegistry
 
 
 class _FakeResponse:

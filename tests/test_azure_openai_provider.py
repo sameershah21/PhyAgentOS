@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from OEA.providers.azure_openai_provider import AzureOpenAIProvider
-from OEA.providers.base import LLMResponse
+from PhyAgentOS.providers.azure_openai_provider import AzureOpenAIProvider
+from PhyAgentOS.providers.base import LLMResponse
 
 
 def test_azure_openai_provider_init():

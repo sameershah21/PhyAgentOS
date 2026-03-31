@@ -5,7 +5,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
-from OEA.cli.commands import app
+from PhyAgentOS.cli.commands import app
 
 runner = CliRunner()
 
@@ -31,7 +31,7 @@ def test_onboard_creates_fleet_shared_and_robot_workspaces(monkeypatch, tmp_path
         ),
         encoding="utf-8",
     )
-    monkeypatch.setattr("OEA.config.loader.get_config_path", lambda: config_path)
+    monkeypatch.setattr("PhyAgentOS.config.loader.get_config_path", lambda: config_path)
 
     result = runner.invoke(app, ["onboard"], input="n\n")
 

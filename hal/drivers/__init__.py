@@ -5,7 +5,7 @@ Driver registry — maps short names to fully-qualified class paths.
 
 To register a new driver, add one entry to ``DRIVER_REGISTRY`` and create
 the corresponding module under ``hal/drivers/``.  External drivers can also
-be installed as plugins and resolved from the local OEA plugin registry.
+be installed as plugins and resolved from the local PhyAgentOS plugin registry.
 """
 
 from __future__ import annotations

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from OEA.config.schema import Config
+from PhyAgentOS.config.schema import Config
 from hal.hal_watchdog import _resolve_watchdog_topology
 
 
@@ -23,7 +23,7 @@ def test_watchdog_resolves_robot_workspace_and_shared_environment(monkeypatch, t
             }
         }
     )
-    monkeypatch.setattr("OEA.config.loader.load_config", lambda: config)
+    monkeypatch.setattr("PhyAgentOS.config.loader.load_config", lambda: config)
 
     robot_workspace, env_file, driver_name, registry = _resolve_watchdog_topology(
         None,

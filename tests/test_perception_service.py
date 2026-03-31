@@ -10,7 +10,7 @@ def _seed_environment(path: Path) -> None:
     save_environment_doc(
         path,
         {
-            "schema_version": "oea.environment.v1",
+            "schema_version": "PhyAgentOS.environment.v1",
             "scene_graph": {"nodes": [], "edges": []},
             "robots": {
                 "desktop_pet_001": {

@@ -54,29 +54,29 @@ PhyAgentOS utilizes a **"State-as-a-File"** protocol matrix, natively supporting
 PhyAgentOS's core is a local workspace where software and hardware operate as independent daemons reading/writing files:
 
 <div align="center">
-  <img src="docs/imgs/oea_en.png" alt="PhyAgentOS" width="900">
+  <img src="docs/imgs/PhyAgentOS_en.png" alt="PhyAgentOS" width="900">
 </div>
 
 ## 🚀 Quick Start
 
 ### 1. Install Dependencies
 ```bash
-git clone https://github.com/your-repo/OpenEmbodiedAgent.git
-cd OpenEmbodiedAgent
+git clone https://github.com/your-repo/Physical Agent Operating System.git
+cd Physical Agent Operating System
 pip install -e .
 # Install simulation dependencies (e.g., watchdog)
 pip install watchdog
 
 # Optional: Install external ReKep real-world plugin
 python scripts/deploy_rekep_real_plugin.py \
-  --repo-url https://github.com/baiyu858/oea-rekep-real-plugin.git
+  --repo-url https://github.com/baiyu858/PhyAgentOS-rekep-real-plugin.git
 ```
 
 ### 2. Initialize Workspace
 ```bash
-OEA onboard
+paos onboard
 ```
-This generates core Markdown protocol files in the current workspace. Single-instance mode defaults to `~/.OEA/workspace/`; Fleet mode uses a shared workspace and multiple robot workspaces under `~/.OEA/workspaces/`.
+This generates core Markdown protocol files in the current workspace. Single-instance mode defaults to `~/.PhyAgentOS/workspace/`; Fleet mode uses a shared workspace and multiple robot workspaces under `~/.PhyAgentOS/workspaces/`.
 
 ### 3. Start the System
 Open two terminals:
@@ -92,11 +92,11 @@ python hal/hal_watchdog.py --driver rekep_real
 
 **Terminal 2: Start Brain Agent (Track A)**
 ```bash
-OEA agent
+paos agent
 ```
 
 ### 4. Interaction Example
-In the `OEA agent` CLI, input:
+In the `paos agent` CLI, input:
 > "Look at what is on the table, then grasp that apple for me."
 
 You will see the action execution in the simulation logs in Terminal 1, and receive completion confirmation from the Agent in Terminal 2.
@@ -104,8 +104,8 @@ You will see the action execution in the simulation logs in Terminal 1, and rece
 ## 📁 Project Structure
 
 ```text
-OpenEmbodiedAgent/
-├── OEA/                # Track A: Software Brain Core
+Physical Agent Operating System/
+├── PhyAgentOS/                # Track A: Software Brain Core
 │   ├── agent/              # Agent Logic (Planner, Critic)
 │   ├── templates/          # Workspace Markdown Templates
 │   └── ...

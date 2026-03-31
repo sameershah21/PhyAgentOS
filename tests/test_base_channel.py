@@ -1,8 +1,8 @@
 from types import SimpleNamespace
 
-from OEA.bus.events import OutboundMessage
-from OEA.bus.queue import MessageBus
-from OEA.channels.base import BaseChannel
+from PhyAgentOS.bus.events import OutboundMessage
+from PhyAgentOS.bus.queue import MessageBus
+from PhyAgentOS.channels.base import BaseChannel
 
 
 class _DummyChannel(BaseChannel):

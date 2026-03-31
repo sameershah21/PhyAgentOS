@@ -3,11 +3,11 @@ x-common-config: &common-config
     context: .
     dockerfile: Dockerfile
   volumes:
-    - ~/.OEA:/root/.OEA
+    - ~/.PhyAgentOS:/root/.PhyAgentOS
 
 services:
-  OEA-gateway:
-    container_name: OEA-gateway
+  PhyAgentOS-gateway:
+    container_name: PhyAgentOS-gateway
     <<: *common-config
     command: ["gateway"]
     restart: unless-stopped
@@ -22,7 +22,7 @@ services:
           cpus: '0.25'
           memory: 256M
   
-  OEA-cli:
+  PhyAgentOS-cli:
     <<: *common-config
     profiles:
       - cli

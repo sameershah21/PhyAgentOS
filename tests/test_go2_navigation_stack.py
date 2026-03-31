@@ -22,7 +22,7 @@ def _write_action(path: Path, payload: dict) -> Path:
 
 def _base_environment() -> dict:
     return {
-        "schema_version": "oea.environment.v1",
+        "schema_version": "PhyAgentOS.environment.v1",
         "scene_graph": {
             "nodes": [
                 {

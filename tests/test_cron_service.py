@@ -2,8 +2,8 @@ import asyncio
 
 import pytest
 
-from OEA.cron.service import CronService
-from OEA.cron.types import CronSchedule
+from PhyAgentOS.cron.service import CronService
+from PhyAgentOS.cron.types import CronSchedule
 
 
 def test_add_job_rejects_unknown_timezone(tmp_path) -> None:

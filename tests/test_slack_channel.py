@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import pytest
 
-from OEA.bus.events import OutboundMessage
-from OEA.bus.queue import MessageBus
-from OEA.channels.slack import SlackChannel
-from OEA.config.schema import SlackConfig
+from PhyAgentOS.bus.events import OutboundMessage
+from PhyAgentOS.bus.queue import MessageBus
+from PhyAgentOS.channels.slack import SlackChannel
+from PhyAgentOS.config.schema import SlackConfig
 
 
 class _FakeAsyncWebClient:

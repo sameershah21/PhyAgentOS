@@ -101,11 +101,11 @@ def _resolve_watchdog_topology(
 ):
     if not robot_id:
         if workspace is None:
-            workspace = Path.home() / ".OEA" / "workspace"
+            workspace = Path.home() / ".PhyAgentOS" / "workspace"
         return workspace, workspace / "ENVIRONMENT.md", driver_name, None
 
-    from OEA.config.loader import load_config
-    from OEA.embodiment_registry import EmbodimentRegistry
+    from PhyAgentOS.config.loader import load_config
+    from PhyAgentOS.embodiment_registry import EmbodimentRegistry
 
     registry = EmbodimentRegistry(load_config())
     instance = registry.require_instance(robot_id)
@@ -187,7 +187,7 @@ def main() -> None:
     from hal.drivers import list_drivers
 
     parser = argparse.ArgumentParser(
-        description="HAL Watchdog - OpenEmbodiedAgent hardware layer",
+        description="HAL Watchdog - Physical Agent Operating System hardware layer",
     )
     parser.add_argument(
         "--driver",
@@ -215,7 +215,7 @@ def main() -> None:
 
     if not robot_workspace.exists():
         print(f"Error: workspace not found: {robot_workspace}", file=sys.stderr)
-        print("Run 'OEA onboard' first.", file=sys.stderr)
+        print("Run 'paos onboard' first.", file=sys.stderr)
         sys.exit(1)
 
     watch_loop(

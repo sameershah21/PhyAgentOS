@@ -5,7 +5,7 @@ The Critic Agent reads this file to validate whether proposed actions are safe a
 
 ## Identity
 
-- **Name**: OEA Desktop Pet
+- **Name**: PhyAgentOS Desktop Pet
 - **Type**: Desktop-level virtual pet (simulation mode)
 
 ## Degrees of Freedom
@@ -46,7 +46,7 @@ The Critic Agent reads this file to validate whether proposed actions are safe a
 
 ## Navigation & Multi-Agent Protocol
 
-- **Environment schema**: `ENVIRONMENT.md` should use `oea.environment.v1` when possible.
+- **Environment schema**: `ENVIRONMENT.md` should use `PhyAgentOS.environment.v1` when possible.
 - **Per-robot state isolation**: each robot writes only its own key in `robots.<robot_id>`.
 - **Connection channel**: `robots.<robot_id>.connection_state` is reserved for runtime connection health.
 - **Pose channel**: `robots.<robot_id>.robot_pose` is reserved for localization state.

@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 
-from OEA.providers.base import ToolCallRequest
-from OEA.providers.litellm_provider import LiteLLMProvider
+from PhyAgentOS.providers.base import ToolCallRequest
+from PhyAgentOS.providers.litellm_provider import LiteLLMProvider
 
 
 def test_litellm_parse_response_preserves_tool_call_provider_fields() -> None:

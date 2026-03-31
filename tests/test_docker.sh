@@ -2,19 +2,19 @@
 set -euo pipefail
 cd "$(dirname "$0")/.." || exit 1
 
-IMAGE_NAME="OEA-test"
+IMAGE_NAME="PhyAgentOS-test"
 
 echo "=== Building Docker image ==="
 docker build -t "$IMAGE_NAME" .
 
 echo ""
-echo "=== Running 'OEA onboard' ==="
-docker run --name OEA-test-run "$IMAGE_NAME" onboard
+echo "=== Running 'PhyAgentOS onboard' ==="
+docker run --name PhyAgentOS-test-run "$IMAGE_NAME" onboard
 
 echo ""
-echo "=== Running 'OEA status' ==="
-STATUS_OUTPUT=$(docker commit OEA-test-run OEA-test-onboarded > /dev/null && \
-    docker run --rm OEA-test-onboarded status 2>&1) || true
+echo "=== Running 'PhyAgentOS status' ==="
+STATUS_OUTPUT=$(docker commit PhyAgentOS-test-run PhyAgentOS-test-onboarded > /dev/null && \
+    docker run --rm PhyAgentOS-test-onboarded status 2>&1) || true
 
 echo "$STATUS_OUTPUT"
 
@@ -31,7 +31,7 @@ check() {
     fi
 }
 
-check "OEA Status"
+check "PhyAgentOS Status"
 check "Config:"
 check "Workspace:"
 check "Model:"
@@ -50,7 +50,7 @@ fi
 # Cleanup
 echo ""
 echo "=== Cleanup ==="
-docker rm -f OEA-test-run 2>/dev/null || true
-docker rmi -f OEA-test-onboarded 2>/dev/null || true
+docker rm -f PhyAgentOS-test-run 2>/dev/null || true
+docker rmi -f PhyAgentOS-test-onboarded 2>/dev/null || true
 docker rmi -f "$IMAGE_NAME" 2>/dev/null || true
 echo "Done."

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install or update the external ReKep real-world plugin for OEA."""
+"""Install or update the external ReKep real-world plugin for PhyAgentOS."""
 
 from __future__ import annotations
 
@@ -32,10 +32,10 @@ def _run_checked(argv: list[str], cwd: Path | None = None) -> str:
 
 
 def _resolve_default_source() -> str:
-    from_env = os.environ.get("OEA_REKEP_REAL_PLUGIN_REPO", "").strip()
+    from_env = os.environ.get("PhyAgentOS_REKEP_REAL_PLUGIN_REPO", "").strip()
     if from_env:
         return from_env
-    sibling = (REPO_ROOT.parent / "oea-rekep-real-plugin").resolve()
+    sibling = (REPO_ROOT.parent / "PhyAgentOS-rekep-real-plugin").resolve()
     if sibling.exists():
         return str(sibling)
     return ""
@@ -105,14 +105,14 @@ def _install_requirements(repo_path: Path, manifest: dict, python_bin: str, with
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Clone/copy the ReKep real plugin repo and register it with OEA.",
+        description="Clone/copy the ReKep real plugin repo and register it with PhyAgentOS.",
     )
     parser.add_argument(
         "--repo-url",
         default="",
         help=(
             "Plugin git URL or local path. "
-            "Defaults to $OEA_REKEP_REAL_PLUGIN_REPO or ../oea-rekep-real-plugin when available."
+            "Defaults to $PhyAgentOS_REKEP_REAL_PLUGIN_REPO or ../PhyAgentOS-rekep-real-plugin when available."
         ),
     )
     parser.add_argument("--ref", default="", help="Optional git branch/tag/commit to checkout.")
@@ -129,7 +129,7 @@ def main() -> None:
     source = args.repo_url.strip() or _resolve_default_source()
     if not source:
         parser.error(
-            "No plugin source available. Pass --repo-url or set OEA_REKEP_REAL_PLUGIN_REPO."
+            "No plugin source available. Pass --repo-url or set PhyAgentOS_REKEP_REAL_PLUGIN_REPO."
         )
 
     plugin_dest = get_plugin_repo_path("rekep_real")

@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from typer.testing import CliRunner
 
-from OEA.cli.commands import app
-from OEA.config.schema import Config
-from OEA.providers.litellm_provider import LiteLLMProvider
-from OEA.providers.openai_codex_provider import _strip_model_prefix
-from OEA.providers.registry import find_by_model
+from PhyAgentOS.cli.commands import app
+from PhyAgentOS.config.schema import Config
+from PhyAgentOS.providers.litellm_provider import LiteLLMProvider
+from PhyAgentOS.providers.openai_codex_provider import _strip_model_prefix
+from PhyAgentOS.providers.registry import find_by_model
 
 runner = CliRunner()
 
@@ -21,10 +21,10 @@ class _StopGateway(RuntimeError):
 @pytest.fixture
 def mock_paths():
     """Mock config/workspace paths for test isolation."""
-    with patch("OEA.config.loader.get_config_path") as mock_cp, \
-         patch("OEA.config.loader.save_config") as mock_sc, \
-         patch("OEA.config.loader.load_config") as mock_lc, \
-         patch("OEA.cli.commands.get_workspace_path") as mock_ws:
+    with patch("PhyAgentOS.config.loader.get_config_path") as mock_cp, \
+         patch("PhyAgentOS.config.loader.save_config") as mock_sc, \
+         patch("PhyAgentOS.config.loader.load_config") as mock_lc, \
+         patch("PhyAgentOS.cli.commands.get_workspace_path") as mock_ws:
 
         base_dir = Path("./test_onboard_data")
         if base_dir.exists():
@@ -53,7 +53,7 @@ def test_onboard_fresh_install(mock_paths):
     assert result.exit_code == 0
     assert "Created config" in result.stdout
     assert "Created workspace" in result.stdout
-    assert "OEA is ready" in result.stdout
+    assert "PhyAgentOS is ready" in result.stdout
     assert config_file.exists()
     assert (workspace_dir / "AGENTS.md").exists()
     assert (workspace_dir / "memory" / "MEMORY.md").exists()
@@ -170,14 +170,14 @@ def mock_agent_runtime(tmp_path):
     config.agents.defaults.workspace = str(tmp_path / "default-workspace")
     cron_dir = tmp_path / "data" / "cron"
 
-    with patch("OEA.config.loader.load_config", return_value=config) as mock_load_config, \
-         patch("OEA.config.paths.get_cron_dir", return_value=cron_dir), \
-         patch("OEA.cli.commands.sync_workspace_templates") as mock_sync_templates, \
-         patch("OEA.cli.commands._make_provider", return_value=object()), \
-         patch("OEA.cli.commands._print_agent_response") as mock_print_response, \
-         patch("OEA.bus.queue.MessageBus"), \
-         patch("OEA.cron.service.CronService"), \
-         patch("OEA.agent.loop.AgentLoop") as mock_agent_loop_cls:
+    with patch("PhyAgentOS.config.loader.load_config", return_value=config) as mock_load_config, \
+         patch("PhyAgentOS.config.paths.get_cron_dir", return_value=cron_dir), \
+         patch("PhyAgentOS.cli.commands.sync_workspace_templates") as mock_sync_templates, \
+         patch("PhyAgentOS.cli.commands._make_provider", return_value=object()), \
+         patch("PhyAgentOS.cli.commands._print_agent_response") as mock_print_response, \
+         patch("PhyAgentOS.bus.queue.MessageBus"), \
+         patch("PhyAgentOS.cron.service.CronService"), \
+         patch("PhyAgentOS.agent.loop.AgentLoop") as mock_agent_loop_cls:
 
         agent_loop = MagicMock()
         agent_loop.channels_config = None
@@ -239,15 +239,15 @@ def test_agent_config_sets_active_path(monkeypatch, tmp_path: Path) -> None:
     seen: dict[str, Path] = {}
 
     monkeypatch.setattr(
-        "OEA.config.loader.set_config_path",
+        "PhyAgentOS.config.loader.set_config_path",
         lambda path: seen.__setitem__("config_path", path),
     )
-    monkeypatch.setattr("OEA.config.loader.load_config", lambda _path=None: config)
-    monkeypatch.setattr("OEA.config.paths.get_cron_dir", lambda: config_file.parent / "cron")
-    monkeypatch.setattr("OEA.cli.commands.sync_workspace_templates", lambda _path: None)
-    monkeypatch.setattr("OEA.cli.commands._make_provider", lambda _config: object())
-    monkeypatch.setattr("OEA.bus.queue.MessageBus", lambda: object())
-    monkeypatch.setattr("OEA.cron.service.CronService", lambda _store: object())
+    monkeypatch.setattr("PhyAgentOS.config.loader.load_config", lambda _path=None: config)
+    monkeypatch.setattr("PhyAgentOS.config.paths.get_cron_dir", lambda: config_file.parent / "cron")
+    monkeypatch.setattr("PhyAgentOS.cli.commands.sync_workspace_templates", lambda _path: None)
+    monkeypatch.setattr("PhyAgentOS.cli.commands._make_provider", lambda _config: object())
+    monkeypatch.setattr("PhyAgentOS.bus.queue.MessageBus", lambda: object())
+    monkeypatch.setattr("PhyAgentOS.cron.service.CronService", lambda _store: object())
 
     class _FakeAgentLoop:
         def __init__(self, *args, **kwargs) -> None:
@@ -259,8 +259,8 @@ def test_agent_config_sets_active_path(monkeypatch, tmp_path: Path) -> None:
         async def close_mcp(self) -> None:
             return None
 
-    monkeypatch.setattr("OEA.agent.loop.AgentLoop", _FakeAgentLoop)
-    monkeypatch.setattr("OEA.cli.commands._print_agent_response", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr("PhyAgentOS.agent.loop.AgentLoop", _FakeAgentLoop)
+    monkeypatch.setattr("PhyAgentOS.cli.commands._print_agent_response", lambda *_args, **_kwargs: None)
 
     result = runner.invoke(app, ["agent", "-m", "hello", "-c", str(config_file)])
 
@@ -316,16 +316,16 @@ def test_gateway_uses_workspace_from_config_by_default(monkeypatch, tmp_path: Pa
     seen: dict[str, Path] = {}
 
     monkeypatch.setattr(
-        "OEA.config.loader.set_config_path",
+        "PhyAgentOS.config.loader.set_config_path",
         lambda path: seen.__setitem__("config_path", path),
     )
-    monkeypatch.setattr("OEA.config.loader.load_config", lambda _path=None: config)
+    monkeypatch.setattr("PhyAgentOS.config.loader.load_config", lambda _path=None: config)
     monkeypatch.setattr(
-        "OEA.cli.commands.sync_workspace_templates",
+        "PhyAgentOS.cli.commands.sync_workspace_templates",
         lambda path: seen.__setitem__("workspace", path),
     )
     monkeypatch.setattr(
-        "OEA.cli.commands._make_provider",
+        "PhyAgentOS.cli.commands._make_provider",
         lambda _config: (_ for _ in ()).throw(_StopGateway("stop")),
     )
 
@@ -346,14 +346,14 @@ def test_gateway_workspace_option_overrides_config(monkeypatch, tmp_path: Path) 
     override = tmp_path / "override-workspace"
     seen: dict[str, Path] = {}
 
-    monkeypatch.setattr("OEA.config.loader.set_config_path", lambda _path: None)
-    monkeypatch.setattr("OEA.config.loader.load_config", lambda _path=None: config)
+    monkeypatch.setattr("PhyAgentOS.config.loader.set_config_path", lambda _path: None)
+    monkeypatch.setattr("PhyAgentOS.config.loader.load_config", lambda _path=None: config)
     monkeypatch.setattr(
-        "OEA.cli.commands.sync_workspace_templates",
+        "PhyAgentOS.cli.commands.sync_workspace_templates",
         lambda path: seen.__setitem__("workspace", path),
     )
     monkeypatch.setattr(
-        "OEA.cli.commands._make_provider",
+        "PhyAgentOS.cli.commands._make_provider",
         lambda _config: (_ for _ in ()).throw(_StopGateway("stop")),
     )
 
@@ -375,11 +375,11 @@ def test_gateway_warns_about_deprecated_memory_window(monkeypatch, tmp_path: Pat
     config = Config()
     config.agents.defaults.memory_window = 100
 
-    monkeypatch.setattr("OEA.config.loader.set_config_path", lambda _path: None)
-    monkeypatch.setattr("OEA.config.loader.load_config", lambda _path=None: config)
-    monkeypatch.setattr("OEA.cli.commands.sync_workspace_templates", lambda _path: None)
+    monkeypatch.setattr("PhyAgentOS.config.loader.set_config_path", lambda _path: None)
+    monkeypatch.setattr("PhyAgentOS.config.loader.load_config", lambda _path=None: config)
+    monkeypatch.setattr("PhyAgentOS.cli.commands.sync_workspace_templates", lambda _path: None)
     monkeypatch.setattr(
-        "OEA.cli.commands._make_provider",
+        "PhyAgentOS.cli.commands._make_provider",
         lambda _config: (_ for _ in ()).throw(_StopGateway("stop")),
     )
 
@@ -398,20 +398,20 @@ def test_gateway_uses_config_directory_for_cron_store(monkeypatch, tmp_path: Pat
     config.agents.defaults.workspace = str(tmp_path / "config-workspace")
     seen: dict[str, Path] = {}
 
-    monkeypatch.setattr("OEA.config.loader.set_config_path", lambda _path: None)
-    monkeypatch.setattr("OEA.config.loader.load_config", lambda _path=None: config)
-    monkeypatch.setattr("OEA.config.paths.get_cron_dir", lambda: config_file.parent / "cron")
-    monkeypatch.setattr("OEA.cli.commands.sync_workspace_templates", lambda _path: None)
-    monkeypatch.setattr("OEA.cli.commands._make_provider", lambda _config: object())
-    monkeypatch.setattr("OEA.bus.queue.MessageBus", lambda: object())
-    monkeypatch.setattr("OEA.session.manager.SessionManager", lambda _workspace: object())
+    monkeypatch.setattr("PhyAgentOS.config.loader.set_config_path", lambda _path: None)
+    monkeypatch.setattr("PhyAgentOS.config.loader.load_config", lambda _path=None: config)
+    monkeypatch.setattr("PhyAgentOS.config.paths.get_cron_dir", lambda: config_file.parent / "cron")
+    monkeypatch.setattr("PhyAgentOS.cli.commands.sync_workspace_templates", lambda _path: None)
+    monkeypatch.setattr("PhyAgentOS.cli.commands._make_provider", lambda _config: object())
+    monkeypatch.setattr("PhyAgentOS.bus.queue.MessageBus", lambda: object())
+    monkeypatch.setattr("PhyAgentOS.session.manager.SessionManager", lambda _workspace: object())
 
     class _StopCron:
         def __init__(self, store_path: Path) -> None:
             seen["cron_store"] = store_path
             raise _StopGateway("stop")
 
-    monkeypatch.setattr("OEA.cron.service.CronService", _StopCron)
+    monkeypatch.setattr("PhyAgentOS.cron.service.CronService", _StopCron)
 
     result = runner.invoke(app, ["gateway", "--config", str(config_file)])
 
@@ -427,11 +427,11 @@ def test_gateway_uses_configured_port_when_cli_flag_is_missing(monkeypatch, tmp_
     config = Config()
     config.gateway.port = 18791
 
-    monkeypatch.setattr("OEA.config.loader.set_config_path", lambda _path: None)
-    monkeypatch.setattr("OEA.config.loader.load_config", lambda _path=None: config)
-    monkeypatch.setattr("OEA.cli.commands.sync_workspace_templates", lambda _path: None)
+    monkeypatch.setattr("PhyAgentOS.config.loader.set_config_path", lambda _path: None)
+    monkeypatch.setattr("PhyAgentOS.config.loader.load_config", lambda _path=None: config)
+    monkeypatch.setattr("PhyAgentOS.cli.commands.sync_workspace_templates", lambda _path: None)
     monkeypatch.setattr(
-        "OEA.cli.commands._make_provider",
+        "PhyAgentOS.cli.commands._make_provider",
         lambda _config: (_ for _ in ()).throw(_StopGateway("stop")),
     )
 
@@ -449,11 +449,11 @@ def test_gateway_cli_port_overrides_configured_port(monkeypatch, tmp_path: Path)
     config = Config()
     config.gateway.port = 18791
 
-    monkeypatch.setattr("OEA.config.loader.set_config_path", lambda _path: None)
-    monkeypatch.setattr("OEA.config.loader.load_config", lambda _path=None: config)
-    monkeypatch.setattr("OEA.cli.commands.sync_workspace_templates", lambda _path: None)
+    monkeypatch.setattr("PhyAgentOS.config.loader.set_config_path", lambda _path: None)
+    monkeypatch.setattr("PhyAgentOS.config.loader.load_config", lambda _path=None: config)
+    monkeypatch.setattr("PhyAgentOS.cli.commands.sync_workspace_templates", lambda _path: None)
     monkeypatch.setattr(
-        "OEA.cli.commands._make_provider",
+        "PhyAgentOS.cli.commands._make_provider",
         lambda _config: (_ for _ in ()).throw(_StopGateway("stop")),
     )
 

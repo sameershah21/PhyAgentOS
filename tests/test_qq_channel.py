@@ -2,10 +2,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from OEA.bus.events import OutboundMessage
-from OEA.bus.queue import MessageBus
-from OEA.channels.qq import QQChannel
-from OEA.config.schema import QQConfig
+from PhyAgentOS.bus.events import OutboundMessage
+from PhyAgentOS.bus.queue import MessageBus
+from PhyAgentOS.channels.qq import QQChannel
+from PhyAgentOS.config.schema import QQConfig
 
 
 class _FakeApi:

@@ -2,8 +2,8 @@ import json
 
 from typer.testing import CliRunner
 
-from OEA.cli.commands import app
-from OEA.config.loader import load_config, save_config
+from PhyAgentOS.cli.commands import app
+from PhyAgentOS.config.loader import load_config, save_config
 
 runner = CliRunner()
 
@@ -74,8 +74,8 @@ def test_onboard_refresh_rewrites_legacy_config_template(tmp_path, monkeypatch) 
         encoding="utf-8",
     )
 
-    monkeypatch.setattr("OEA.config.loader.get_config_path", lambda: config_path)
-    monkeypatch.setattr("OEA.cli.commands.get_workspace_path", lambda: workspace)
+    monkeypatch.setattr("PhyAgentOS.config.loader.get_config_path", lambda: config_path)
+    monkeypatch.setattr("PhyAgentOS.cli.commands.get_workspace_path", lambda: workspace)
 
     result = runner.invoke(app, ["onboard"], input="n\n")
 

@@ -15,10 +15,10 @@ def _write(path: Path, content: str) -> None:
 def test_external_driver_can_be_registered_and_loaded(tmp_path, monkeypatch):
     plugin_home = tmp_path / "plugin-home"
     plugin_repo = tmp_path / "sample-plugin"
-    monkeypatch.setenv("OEA_PLUGIN_HOME", str(plugin_home))
+    monkeypatch.setenv("PhyAgentOS_PLUGIN_HOME", str(plugin_home))
 
     _write(
-        plugin_repo / "oea_plugin.toml",
+        plugin_repo / "PhyAgentOS_plugin.toml",
         """
         [plugin]
         name = "sample_plugin"

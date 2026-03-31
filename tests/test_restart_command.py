@@ -7,13 +7,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from OEA.bus.events import InboundMessage
+from PhyAgentOS.bus.events import InboundMessage
 
 
 def _make_loop():
     """Create a minimal AgentLoop with mocked dependencies."""
-    from OEA.agent.loop import AgentLoop
-    from OEA.bus.queue import MessageBus
+    from PhyAgentOS.agent.loop import AgentLoop
+    from PhyAgentOS.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -21,9 +21,9 @@ def _make_loop():
     workspace = MagicMock()
     workspace.__truediv__ = MagicMock(return_value=MagicMock())
 
-    with patch("OEA.agent.loop.ContextBuilder"), \
-         patch("OEA.agent.loop.SessionManager"), \
-         patch("OEA.agent.loop.SubagentManager"):
+    with patch("PhyAgentOS.agent.loop.ContextBuilder"), \
+         patch("PhyAgentOS.agent.loop.SessionManager"), \
+         patch("PhyAgentOS.agent.loop.SubagentManager"):
         loop = AgentLoop(bus=bus, provider=provider, workspace=workspace)
     return loop, bus
 
@@ -35,7 +35,7 @@ class TestRestartCommand:
         loop, bus = _make_loop()
         msg = InboundMessage(channel="cli", sender_id="user", chat_id="direct", content="/restart")
 
-        with patch("OEA.agent.loop.os.execv") as mock_execv:
+        with patch("PhyAgentOS.agent.loop.os.execv") as mock_execv:
             await loop._handle_restart(msg)
             out = await asyncio.wait_for(bus.consume_outbound(), timeout=1.0)
             assert "Restarting" in out.content

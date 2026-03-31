@@ -11,10 +11,10 @@ import sys
 import tomllib
 from typing import Any
 
-_PLUGIN_HOME_ENV = "OEA_PLUGIN_HOME"
-_DEFAULT_PLUGIN_HOME = Path.home() / ".OEA" / "plugins"
+_PLUGIN_HOME_ENV = "PhyAgentOS_PLUGIN_HOME"
+_DEFAULT_PLUGIN_HOME = Path.home() / ".PhyAgentOS" / "plugins"
 _REGISTRY_FILENAME = "registry.json"
-_MANIFEST_FILENAME = "oea_plugin.toml"
+_MANIFEST_FILENAME = "PhyAgentOS_plugin.toml"
 
 
 @dataclass(frozen=True)

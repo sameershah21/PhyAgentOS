@@ -4,9 +4,9 @@ import asyncio
 import json
 from pathlib import Path
 
-from OEA.agent.tools.embodied import EmbodiedActionTool
-from OEA.agent.tools.scene_graph import SceneGraphQueryTool
-from OEA.agent.tools.semantic_navigation import SemanticNavigationTool
+from PhyAgentOS.agent.tools.embodied import EmbodiedActionTool
+from PhyAgentOS.agent.tools.scene_graph import SceneGraphQueryTool
+from PhyAgentOS.agent.tools.semantic_navigation import SemanticNavigationTool
 from hal.perception.environment_writer import EnvironmentWriter
 from hal.simulation.scene_io import load_environment_doc, save_environment_doc
 
@@ -30,7 +30,7 @@ def _write_workspace_files(workspace: Path) -> None:
     save_environment_doc(
         workspace / "ENVIRONMENT.md",
         {
-            "schema_version": "oea.environment.v1",
+            "schema_version": "PhyAgentOS.environment.v1",
             "scene_graph": {
                 "nodes": [
                     {

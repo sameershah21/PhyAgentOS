@@ -1,4 +1,4 @@
-from OEA.channels.feishu import FeishuChannel, _extract_post_content
+from PhyAgentOS.channels.feishu import FeishuChannel, _extract_post_content
 
 
 def test_extract_post_content_supports_post_wrapper_shape() -> None:

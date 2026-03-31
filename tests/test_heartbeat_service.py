@@ -2,8 +2,8 @@ import asyncio
 
 import pytest
 
-from OEA.heartbeat.service import HeartbeatService
-from OEA.providers.base import LLMProvider, LLMResponse, ToolCallRequest
+from PhyAgentOS.heartbeat.service import HeartbeatService
+from PhyAgentOS.providers.base import LLMProvider, LLMResponse, ToolCallRequest
 
 
 class DummyProvider(LLMProvider):

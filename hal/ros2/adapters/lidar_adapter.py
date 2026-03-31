@@ -6,7 +6,7 @@ from typing import Any
 
 
 class LidarAdapter:
-    """Normalizes point cloud or scan data into OEA transport payloads."""
+    """Normalizes point cloud or scan data into PhyAgentOS transport payloads."""
 
     def normalize(self, cloud: Any, frame: str = "lidar") -> dict:
         return {"frame": frame, "cloud": cloud}

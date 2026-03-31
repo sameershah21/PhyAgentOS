@@ -3,10 +3,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from OEA.bus.queue import MessageBus
-import OEA.channels.dingtalk as dingtalk_module
-from OEA.channels.dingtalk import DingTalkChannel, OEADingTalkHandler
-from OEA.config.schema import DingTalkConfig
+from PhyAgentOS.bus.queue import MessageBus
+import PhyAgentOS.channels.dingtalk as dingtalk_module
+from PhyAgentOS.channels.dingtalk import DingTalkChannel, PhyAgentOSDingTalkHandler
+from PhyAgentOS.config.schema import DingTalkConfig
 
 
 class _FakeResponse:
@@ -58,7 +58,7 @@ async def test_group_send_uses_group_messages_api() -> None:
         "token",
         "group:conv123",
         "sampleMarkdown",
-        {"text": "hello", "title": "OEA Reply"},
+        {"text": "hello", "title": "PhyAgentOS Reply"},
     )
 
     assert ok is True
@@ -75,7 +75,7 @@ async def test_handler_uses_voice_recognition_text_when_text_is_empty(monkeypatc
         DingTalkConfig(client_id="app", client_secret="secret", allow_from=["user1"]),
         bus,
     )
-    handler = OEADingTalkHandler(channel)
+    handler = PhyAgentOSDingTalkHandler(channel)
 
     class _FakeChatbotMessage:
         text = None

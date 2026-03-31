@@ -6,7 +6,7 @@ from typing import Any
 
 
 class RGBDAdapter:
-    """Normalizes vendor RGB-D streams into OEA-friendly payloads."""
+    """Normalizes vendor RGB-D streams into PhyAgentOS-friendly payloads."""
 
     def normalize(self, color: Any, depth: Any, camera_info: dict | None = None) -> dict:
         return {

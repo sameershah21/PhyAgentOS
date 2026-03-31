@@ -1,20 +1,20 @@
 # Communication Architecture / 通信架构说明
 
-This document explains how OpenEmbodiedAgent components communicate at runtime.
+This document explains how Physical Agent Operating System components communicate at runtime.
 It is a bilingual architectural guide, not a live protocol bus by itself.
 
-本文说明 OpenEmbodiedAgent 在运行时如何通信。
+本文说明 Physical Agent Operating System 在运行时如何通信。
 它是一份中英双语的架构说明书，不是实际承载通信的运行态总线。
 
 ## 1. Core Principle / 核心原则
 
-OpenEmbodiedAgent follows a Markdown-first design:
+Physical Agent Operating System follows a Markdown-first design:
 
 - Track A (Agent side) plans, reasons, and validates.
 - Track B (HAL side) executes through drivers and watchdogs.
 - Shared state is exposed through Markdown files instead of direct cross-layer Python calls.
 
-OpenEmbodiedAgent 采用 Markdown-first 设计：
+Physical Agent Operating System 采用 Markdown-first 设计：
 
 - Track A（Agent 侧）负责理解、规划、校验。
 - Track B（HAL 侧）负责通过 driver 和 watchdog 执行。
@@ -24,27 +24,27 @@ OpenEmbodiedAgent 采用 Markdown-first 设计：
 
 ### Single mode
 
-- One workspace, usually `~/.OEA/workspace`
+- One workspace, usually `~/.PhyAgentOS/workspace`
 - Agent and watchdog both operate around the same runtime directory
 
 ### Fleet mode
 
-- One shared workspace, usually `~/.OEA/workspaces/shared`
+- One shared workspace, usually `~/.PhyAgentOS/workspaces/shared`
 - One robot workspace per embodied instance, for example:
-  - `~/.OEA/workspaces/go2_edu_001`
-  - `~/.OEA/workspaces/desktop_pet_001`
+  - `~/.PhyAgentOS/workspaces/go2_edu_001`
+  - `~/.PhyAgentOS/workspaces/desktop_pet_001`
 
 单实例模式：
 
-- 只有一个 workspace，通常是 `~/.OEA/workspace`
+- 只有一个 workspace，通常是 `~/.PhyAgentOS/workspace`
 - Agent 和 watchdog 围绕同一个运行目录工作
 
 Fleet 模式：
 
-- 一个 shared workspace，通常是 `~/.OEA/workspaces/shared`
+- 一个 shared workspace，通常是 `~/.PhyAgentOS/workspaces/shared`
 - 每个机器人实例一个 robot workspace，例如：
-  - `~/.OEA/workspaces/go2_edu_001`
-  - `~/.OEA/workspaces/desktop_pet_001`
+  - `~/.PhyAgentOS/workspaces/go2_edu_001`
+  - `~/.PhyAgentOS/workspaces/desktop_pet_001`
 
 ## 3. File Responsibilities / 文件职责
 
@@ -96,7 +96,7 @@ Robot workspace 文件：
 
 ## 4. Template vs Profile / 模板与 Profile 的区别
 
-`OEA/templates/EMBODIED.md` is only a structural template.
+`PhyAgentOS/templates/EMBODIED.md` is only a structural template.
 It explains:
 
 - what sections `EMBODIED.md` should contain
@@ -106,7 +106,7 @@ It explains:
 
 Concrete robot values must live in `hal/profiles/*.md`.
 
-`OEA/templates/EMBODIED.md` 只是结构模板。
+`PhyAgentOS/templates/EMBODIED.md` 只是结构模板。
 它用于说明：
 
 - `EMBODIED.md` 应包含哪些 section
@@ -183,23 +183,23 @@ Watchdog：
 
 ## 6. Typical Runtime Pipeline / 典型运行流程
 
-1. `OEA onboard` prepares workspaces.
+1. `paos onboard` prepares workspaces.
 2. Fleet config defines which robots exist.
 3. Shared `ROBOTS.md` is generated from config plus runtime summary.
 4. User starts one watchdog per robot instance.
 5. Watchdog installs that robot's profile as runtime `EMBODIED.md`.
-6. User starts `OEA agent`.
+6. User starts `paos agent`.
 7. Agent plans from shared state and chooses a robot.
 8. `EmbodiedActionTool` validates against the target robot's runtime `EMBODIED.md`.
 9. The action is written to that robot workspace's `ACTION.md`.
 10. The matching watchdog executes it and writes runtime updates back to shared files.
 
-1. `OEA onboard` 准备工作区。
+1. `paos onboard` 准备工作区。
 2. Fleet 配置定义有哪些机器人实例。
 3. shared `ROBOTS.md` 根据配置和运行摘要自动生成。
 4. 用户为每个机器人实例启动一个 watchdog。
 5. watchdog 将该机器人的 profile 安装为 runtime `EMBODIED.md`。
-6. 用户启动 `OEA agent`。
+6. 用户启动 `paos agent`。
 7. Agent 基于 shared 状态规划并选择机器人。
 8. `EmbodiedActionTool` 使用目标机器人的 runtime `EMBODIED.md` 做校验。
 9. 动作被写入该机器人 workspace 的 `ACTION.md`。

@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from prompt_toolkit.formatted_text import HTML
 
-from OEA.cli import commands
+from PhyAgentOS.cli import commands
 
 
 @pytest.fixture
@@ -12,8 +12,8 @@ def mock_prompt_session():
     """Mock the global prompt session."""
     mock_session = MagicMock()
     mock_session.prompt_async = AsyncMock()
-    with patch("OEA.cli.commands._PROMPT_SESSION", mock_session), \
-         patch("OEA.cli.commands.patch_stdout"):
+    with patch("PhyAgentOS.cli.commands._PROMPT_SESSION", mock_session), \
+         patch("PhyAgentOS.cli.commands.patch_stdout"):
         yield mock_session
 
 
@@ -44,8 +44,8 @@ def test_init_prompt_session_creates_session():
     # Ensure global is None before test
     commands._PROMPT_SESSION = None
     
-    with patch("OEA.cli.commands.PromptSession") as MockSession, \
-         patch("OEA.cli.commands.FileHistory") as MockHistory, \
+    with patch("PhyAgentOS.cli.commands.PromptSession") as MockSession, \
+         patch("PhyAgentOS.cli.commands.FileHistory") as MockHistory, \
          patch("pathlib.Path.home") as mock_home:
         
         mock_home.return_value = MagicMock()

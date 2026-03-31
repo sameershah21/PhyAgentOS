@@ -1,11 +1,11 @@
 [project]
-name = "OEA-ai"
+name = "PhyAgentOS-ai"
 version = "0.1.4.post4"
 description = "A lightweight personal AI assistant framework"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
-    {name = "OEA contributors"}
+    {name = "PhyAgentOS contributors"}
 ]
 keywords = ["ai", "agent", "chatbot"]
 classifiers = [
@@ -66,7 +66,7 @@ dev = [
 ]
 
 [project.scripts]
-OEA = "OEA.cli.commands:app"
+paos = "PhyAgentOS.cli.commands:app"
 
 [build-system]
 requires = ["hatchling"]
@@ -76,30 +76,30 @@ build-backend = "hatchling.build"
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["OEA"]
+packages = ["PhyAgentOS"]
 
 [tool.hatch.build.targets.wheel.sources]
-"OEA" = "OEA"
+"PhyAgentOS" = "PhyAgentOS"
 
 # Include non-Python files in skills and templates
 [tool.hatch.build]
 include = [
-    "OEA/**/*.py",
-    "OEA/templates/**/*.md",
-    "OEA/skills/**/*.md",
-    "OEA/skills/**/*.sh",
+    "PhyAgentOS/**/*.py",
+    "PhyAgentOS/templates/**/*.md",
+    "PhyAgentOS/skills/**/*.md",
+    "PhyAgentOS/skills/**/*.sh",
 ]
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "OEA/",
+    "PhyAgentOS/",
     "bridge/",
     "README.md",
     "LICENSE",
 ]
 
 [tool.hatch.build.targets.wheel.force-include]
-"bridge" = "OEA/bridge"
+"bridge" = "PhyAgentOS/bridge"
 
 [tool.ruff]
 line-length = 100

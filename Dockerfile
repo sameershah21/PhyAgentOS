@@ -16,12 +16,12 @@ WORKDIR /app
 
 # Install Python dependencies first (cached layer)
 COPY pyproject.toml README.md LICENSE ./
-RUN mkdir -p OEA bridge && touch OEA/__init__.py && \
+RUN mkdir -p PhyAgentOS bridge && touch PhyAgentOS/__init__.py && \
     uv pip install --system --no-cache . && \
-    rm -rf OEA bridge
+    rm -rf PhyAgentOS bridge
 
 # Copy the full source and install
-COPY OEA/ OEA/
+COPY PhyAgentOS/ PhyAgentOS/
 COPY bridge/ bridge/
 RUN uv pip install --system --no-cache .
 
@@ -31,10 +31,10 @@ RUN npm install && npm run build
 WORKDIR /app
 
 # Create config directory
-RUN mkdir -p /root/.OEA
+RUN mkdir -p /root/.PhyAgentOS
 
 # Gateway default port
 EXPOSE 18790
 
-ENTRYPOINT ["OEA"]
+ENTRYPOINT ["PhyAgentOS"]
 CMD ["status"]

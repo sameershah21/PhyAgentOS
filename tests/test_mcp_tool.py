@@ -6,7 +6,7 @@ from types import ModuleType, SimpleNamespace
 
 import pytest
 
-from OEA.agent.tools.mcp import MCPToolWrapper
+from PhyAgentOS.agent.tools.mcp import MCPToolWrapper
 
 
 class _FakeTextContent:

@@ -1,1 +1,1 @@
-"""hal — Hardware Abstraction Layer for OpenEmbodiedAgent."""
+"""hal — Hardware Abstraction Layer for Physical Agent Operating System."""

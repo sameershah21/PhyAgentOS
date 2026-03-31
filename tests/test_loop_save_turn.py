@@ -1,6 +1,6 @@
-from OEA.agent.context import ContextBuilder
-from OEA.agent.loop import AgentLoop
-from OEA.session.manager import Session
+from PhyAgentOS.agent.context import ContextBuilder
+from PhyAgentOS.agent.loop import AgentLoop
+from PhyAgentOS.session.manager import Session
 
 
 def _mk_loop() -> AgentLoop:

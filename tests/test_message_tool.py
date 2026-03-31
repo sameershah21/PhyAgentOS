@@ -1,6 +1,6 @@
 import pytest
 
-from OEA.agent.tools.message import MessageTool
+from PhyAgentOS.agent.tools.message import MessageTool
 
 
 @pytest.mark.asyncio

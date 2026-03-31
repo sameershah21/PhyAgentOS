@@ -1,10 +1,10 @@
-# OpenEmbodiedAgent (OEA) 用户开发手册
+# Physical Agent Operating System (PhyAgentOS) 用户开发手册
 
 > **版本**: 0.0.5 | **状态**: 草案 (Draft)
 
 ## 1. 简介
 
-欢迎使用 OpenEmbodiedAgent (OEA) 用户开发手册。本文档旨在指导开发者如何基于 OEA 框架进行二次开发，包括但不限于：
+欢迎使用 Physical Agent Operating System (PhyAgentOS) 用户开发手册。本文档旨在指导开发者如何基于 PhyAgentOS 框架进行二次开发，包括但不限于：
 *   开发新的硬件驱动 (Driver)
 *   编写自定义技能 (Skill)
 *   集成外部感知模块 (Perception)
@@ -12,7 +12,7 @@
 
 ## 2. 架构概览
 
-OEA 采用“认知-物理解耦”的架构，通过 Markdown 文件（Workspace API）作为软硬件通信的唯一桥梁。
+PhyAgentOS 采用“认知-物理解耦”的架构，通过 Markdown 文件（Workspace API）作为软硬件通信的唯一桥梁。
 
 *   **Track A (软件大脑)**: 负责推理、规划、记忆和多智能体协同。
 *   **Track B (硬件小脑)**: 负责解析 `ACTION.md`，驱动物理或仿真硬件，并更新 `ENVIRONMENT.md`。
@@ -30,12 +30,12 @@ OEA 采用“认知-物理解耦”的架构，通过 Markdown 文件（Workspac
 在 `hal/drivers/__init__.py` 的 `DRIVER_REGISTRY` 中注册新驱动。
 
 ### 3.3 外部插件机制
-对于不希望直接修改 OEA 核心代码的外部硬件，可以使用插件机制。
+对于不希望直接修改 PhyAgentOS 核心代码的外部硬件，可以使用插件机制。
 参考 `scripts/deploy_rekep_real_plugin.py` 了解如何动态加载外部驱动。
 
 ## 4. 编写自定义技能 (Skill)
 
-技能 (Skill) 是 OEA 中可复用的认知方法论，存储在 `SKILL.md` 中。
+技能 (Skill) 是 PhyAgentOS 中可复用的认知方法论，存储在 `SKILL.md` 中。
 
 ### 4.1 技能结构
 一个标准的 `SKILL.md` 应包含：
@@ -49,7 +49,7 @@ OEA 采用“认知-物理解耦”的架构，通过 Markdown 文件（Workspac
 
 ## 5. 集成感知模块 (Perception)
 
-OEA 提供了 `PerceptionService` 用于处理多模态传感器数据。
+PhyAgentOS 提供了 `PerceptionService` 用于处理多模态传感器数据。
 
 ### 5.1 几何与语义融合
 *   **GeometryPipeline**: 处理点云和里程计数据。

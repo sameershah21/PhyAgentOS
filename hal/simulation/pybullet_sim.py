@@ -1,7 +1,7 @@
 """
 hal/simulation/pybullet_sim.py
 
-PyBullet-backed physics simulator for OpenEmbodiedAgent.
+PyBullet-backed physics simulator for Physical Agent Operating System.
 
 Responsibilities
 ────────────────
@@ -42,7 +42,7 @@ _GROUND_Z = 0.0
 
 
 class PyBulletSimulator:
-    """Thin wrapper around PyBullet for OEA simulation.
+    """Thin wrapper around PyBullet for PhyAgentOS simulation.
 
     Parameters
     ----------
