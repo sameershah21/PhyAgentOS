@@ -9,6 +9,9 @@
     <img src="https://img.shields.io/badge/version-0.0.5-blue" alt="Version">
     <img src="https://img.shields.io/badge/python-≥3.10-blue" alt="Python">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+    <a href="https://sysu-hcp-eai.github.io/PhyAgentOS-website/">
+        <img src="https://img.shields.io/badge/🔗_Website-online-orange" alt="Website">
+    </a>
   </p>
 </div>
 
@@ -94,6 +97,12 @@ Open two terminals:
 ```bash
 python hal/hal_watchdog.py
 ```
+To pass driver-specific runtime configuration without specializing the watchdog CLI, use:
+```bash
+python hal/hal_watchdog.py --driver <driver_name> --driver-config path/to/driver.json
+```
+The config file must be a JSON object and its keys are passed through to the selected driver constructor unchanged.
+
 To use real-world ReKep instead of simulation, install the plugin and run:
 ```bash
 python hal/hal_watchdog.py --driver rekep_real
@@ -114,8 +123,13 @@ To auto-onboard a new robot into `PhyAgentOS-rekep-real-plugin` with the built-i
 
 1. Place the robot SDK under `../PhyAgentOS-rekep-real-plugin/runtime/third_party/<robot_slug>/` or `~/.PhyAgentOS/plugins/repos/rekep_real/runtime/third_party/<robot_slug>/`.
 2. Tell the agent: `Help me onboard a new robot <robot name> into ReKep`.
-3. The skill will inspect the SDK, draft the adapter/factory changes, and return deployment and startup instructions. Full reference: [docs/PLUGIN_DEVELOPMENT_GUIDE.md](docs/PLUGIN_DEVELOPMENT_GUIDE.md).
+3. The skill will inspect the SDK, draft the adapter/factory changes, and return deployment and startup instructions. Full reference: [docs/user_development_guide/PLUGIN_DEVELOPMENT_GUIDE.md](docs/user_development_guide/PLUGIN_DEVELOPMENT_GUIDE.md).
 
+### 5. More Information
+
+[User Manual](docs/user_manual/README.md): Operations guide for end users, integrators, and demo operators.
+
+[Development Guide](docs/user_development_guide/README.md): Layered guide for secondary developers, hardware integrators, plugin authors, and maintainers.
 
 ## 📁 Project Structure
 
@@ -170,17 +184,17 @@ PhyAgentOS supports various embodiment types through the HAL (Hardware Abstracti
 | **Composite Robot** | AgileX PIPER + Unitree Go2 | 🟡 Partial |  locomotion adaptation in progress |
 | **Desktop Robot Arm** | Dobot Nova 2 | 🟢 Verified | ReKep deployment verified |
 | **Quadruped Robot** | Unitree Go2 | 🟡 Partial | Currently supports mobility and semantic navigation |
-| **Dual-Arm Control** | XLeRobot | 🟡 Partial | Currently supports dual-arm manipulation protocol |
+| **Dual-Arm Control** | XLeRobot | 🟢 Verified |  Deployment and dual-arm capture have now been achieved |
 | **IoT Device** | XiaoZhi (ESP32) | 🟡 Partial | Currently supports voice dialogue interaction |
-| **Industrial Robot** | Franka Research 3 | ⚪ Untested | Driver protocol integration in progress |
+| **Industrial Robot** | Franka Research 3 | 🟢 Verified | Visual Reasoning and capture have been achieved |
 | **Edu Robot** | Hiwonder Series | 🔴 Unsupported | Awaiting driver plugin development |
 | **General Environment** | Built-in Simulator | 🟢 Verified | Lightweight simulation based on disk mapping |
 
-> **Note**: PhyAgentOS is designed with a plugin architecture. Any hardware that supports a Python control interface can be quickly integrated via `hal/drivers/`. A community plugin template is available at `docs/PLUGIN_DEVELOPMENT_GUIDE.md`, with the Chinese version at `docs/PLUGIN_DEVELOPMENT_GUIDE_zh.md`.
+> **Note**: PhyAgentOS is designed with a plugin architecture. Any hardware that supports a Python control interface can be quickly integrated via `hal/drivers/`. A community plugin template is available at `docs/user_development_guide/PLUGIN_DEVELOPMENT_GUIDE.md`, with the Chinese version at `docs/user_development_guide/PLUGIN_DEVELOPMENT_GUIDE_zh.md`.
 
 ## 🤝 Contribute
 
-PRs and Issues are welcome! Please refer to `docs/USER_DEVELOPMENT_GUIDE.md` for detailed architecture design and development guidelines.
+PRs and Issues are welcome! Please refer to `docs/user_development_guide/README.md` for detailed architecture design and development guidelines.
 
 ---
 

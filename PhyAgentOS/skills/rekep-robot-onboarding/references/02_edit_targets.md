@@ -25,8 +25,8 @@ If you are introducing or documenting this workflow in PhyAgentOS itself, keep c
 - `README.md`
 - `README_zh.md`
 - `PhyAgentOS/skills/README.md`
-- `docs/PLUGIN_DEVELOPMENT_GUIDE.md`
-- `docs/PLUGIN_DEVELOPMENT_GUIDE_zh.md`
+- `docs/user_development_guide/PLUGIN_DEVELOPMENT_GUIDE.md`
+- `docs/user_development_guide/PLUGIN_DEVELOPMENT_GUIDE_zh.md`
 
 ## Adapter Design Guidance
 

@@ -13,7 +13,7 @@ This guide answers four questions:
 
 If you want the agent to scaffold the integration from a vendor SDK before you refine it manually, the main repository also ships a built-in skill:
 
-- [`PhyAgentOS/skills/rekep-robot-onboarding`](../PhyAgentOS/skills/rekep-robot-onboarding/SKILL.md)
+- [`PhyAgentOS/skills/rekep-robot-onboarding`](../../PhyAgentOS/skills/rekep-robot-onboarding/SKILL.md)
 
 The typical flow is to place the SDK under `PhyAgentOS-rekep-real-plugin/runtime/third_party/<robot_slug>/` and then tell the agent:
 

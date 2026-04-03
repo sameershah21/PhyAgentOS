@@ -13,7 +13,7 @@
 
 如果你希望先让智能体帮你从 SDK 自动起草适配代码，而不是手工从零开始，主仓库还提供了一个现成的 skill：
 
-- [`PhyAgentOS/skills/rekep-robot-onboarding`](../PhyAgentOS/skills/rekep-robot-onboarding/SKILL.md)
+- [`PhyAgentOS/skills/rekep-robot-onboarding`](../../PhyAgentOS/skills/rekep-robot-onboarding/SKILL.md)
 
 典型用法是先把 SDK 放进 `PhyAgentOS-rekep-real-plugin/runtime/third_party/<robot_slug>/`，然后直接对智能体说：
 
