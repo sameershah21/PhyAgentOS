@@ -126,3 +126,63 @@ def test_embodied_action_tool_requires_robot_id_in_fleet_mode(tmp_path: Path) ->
     )
 
     assert "robot_id is required" in result
+
+
+def test_embodied_action_tool_rejects_when_action_file_already_pending(tmp_path: Path) -> None:
+    registry = EmbodimentRegistry(_fleet_config(tmp_path))
+    registry.sync_layout()
+    shared = registry.resolve_agent_workspace()
+    robot_action = tmp_path / "workspaces" / "go2_edu_001" / "ACTION.md"
+    robot_action.write_text(
+        "```json\n{\n  \"action_type\": \"connect_robot\",\n  \"parameters\": {\"robot_id\": \"go2_edu_001\"},\n  \"status\": \"pending\"\n}\n```\n",
+        encoding="utf-8",
+    )
+
+    tool = EmbodiedActionTool(
+        workspace=shared,
+        provider=_FakeProvider(),
+        model="fake",
+        registry=registry,
+    )
+
+    result = asyncio.run(
+        tool.execute(
+            action_type="stop",
+            parameters={"robot_id": "go2_edu_001"},
+            reasoning="Need to stop the robot.",
+        )
+    )
+
+    assert "already contains pending action 'connect_robot'" in result
+
+
+def test_registry_render_robot_index_reads_instance_specific_environment(tmp_path: Path) -> None:
+    config = Config.model_validate(
+        {
+            "embodiments": {
+                "mode": "fleet",
+                "sharedWorkspace": str(tmp_path / "workspaces" / "shared"),
+                "instances": [
+                    {
+                        "robotId": "go2_edu_001",
+                        "driver": "go2_edu",
+                        "workspace": str(tmp_path / "workspaces" / "go2_edu_001"),
+                        "enabled": True,
+                        "sharedEnvironment": str(tmp_path / "workspaces" / "go2_edu_001" / "ENVIRONMENT.md"),
+                    }
+                ],
+            }
+        }
+    )
+    registry = EmbodimentRegistry(config)
+    registry.sync_layout()
+    robot_env = tmp_path / "workspaces" / "go2_edu_001" / "ENVIRONMENT.md"
+    robot_env.write_text(
+        "# Environment State\n\n```json\n{\"schema_version\":\"oea.environment.v1\",\"scene_graph\":{\"nodes\":[],\"edges\":[]},\"robots\":{\"go2_edu_001\":{\"connection_state\":{\"status\":\"connected\"},\"nav_state\":{\"status\":\"arrived\"}}},\"objects\":{}}\n```\n",
+        encoding="utf-8",
+    )
+
+    content = registry.render_robot_index()
+
+    assert "| go2_edu_001 | go2_edu |" in content
+    assert "connected | arrived |" in content

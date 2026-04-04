@@ -112,9 +112,7 @@ class EmbodiedActionTool(Tool):
             f"Action Type: {action_type}\n"
             f"Parameters: {params_json}\n"
             f"Reasoning: {reasoning}\n\n"
-            "When evaluating semantic navigation, target navigation, and localization actions, verify target existence, "
-            "navigation support, safe approach distance, connection availability, and whether current "
-            "nav state suggests the robot can accept the task.\n"
+            f"{self._critic_guidance(action_type)}\n"
             "If it is safe and valid, respond with exactly 'VALID'.\n"
             "If it is unsafe, out of bounds, or invalid, respond with 'INVALID: <reason>'.\n"
         )
@@ -153,6 +151,12 @@ class EmbodiedActionTool(Tool):
     @staticmethod
     def _accept_action(action_type: str, parameters: dict[str, Any], action_file: Path) -> str:
         """Write validated action to ACTION.md."""
+        existing_action = EmbodiedActionTool._pending_action_type(action_file)
+        if existing_action is not None:
+            return (
+                f"Error: ACTION.md already contains pending action '{existing_action}'. "
+                "Wait for the watchdog to consume it before dispatching another action."
+            )
         action_data = {
             "action_type": action_type,
             "parameters": parameters,
@@ -168,6 +172,38 @@ class EmbodiedActionTool(Tool):
 
         logger.info("Action validated and written to {}: {}", action_file, action_type)
         return f"Action '{action_type}' validated and dispatched to hardware."
+
+    @staticmethod
+    def _pending_action_type(action_file: Path) -> str | None:
+        if not action_file.exists():
+            return None
+        content = action_file.read_text(encoding="utf-8").strip()
+        if not content:
+            return None
+        try:
+            _, json_block = content.split(_FENCE_OPEN, 1)
+            json_block, _ = json_block.split(_FENCE_CLOSE, 1)
+            payload = json.loads(json_block)
+        except (ValueError, json.JSONDecodeError):
+            return "unknown"
+        if not isinstance(payload, dict):
+            return "unknown"
+        return str(payload.get("action_type") or "unknown")
+
+    @staticmethod
+    def _critic_guidance(action_type: str) -> str:
+        if action_type == "target_navigation":
+            return (
+                "When evaluating target navigation, do not require the target to already exist in the scene graph. "
+                "Instead verify that lower-level target navigation is supported, the requested visual target or "
+                "detection hint is specific enough to pursue safely, connection state allows navigation, and the "
+                "current nav state suggests the robot can accept the task."
+            )
+        return (
+            "When evaluating semantic navigation and localization actions, verify target existence, navigation "
+            "support, safe approach distance, connection availability, and whether current nav state suggests the "
+            "robot can accept the task."
+        )
 
     @staticmethod
     def _reject_action(
