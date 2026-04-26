@@ -30,7 +30,6 @@ DRIVER_REGISTRY: dict[str, str] = {
     "xlerobot_2wheels_remote": "hal.drivers.xlerobot_2wheels_remote_driver.XLerobot2WheelsRemoteDriver",
     "reachy_mini": "hal.drivers.reachy_mini_driver.ReachyMiniDriver",
     "so101_greeting": "hal.drivers.so101_gesture_driver.SO101GestureDriver",
-    "so101": "hal.drivers.so101_gesture_driver.SO101GestureDriver",
     "pipergo2_manipulation": "hal.drivers.pipergo2_manipulation_driver.PiperGo2ManipulationDriver",
     # Franka Research 3 驱动
     # Franka Research 3 Driver
