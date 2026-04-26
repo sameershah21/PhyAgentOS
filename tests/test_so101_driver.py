@@ -120,6 +120,126 @@ class TestSO101DriverBehavior:
         scene = driver_with_bottle.get_scene()
         assert scene["bottle_02"]["carried_by"] == "so101_001"
 
-    def test_real_hardware_path_raises_until_implemented(self):
-        with pytest.raises(NotImplementedError):
+    def test_move_to_joints_mock_succeeds(self, driver):
+        result = driver.execute_action(
+            "move_to_joints", {"joints": [0.1, -0.2, 0.3, 0.0, 0.0, 0.0]}
+        )
+        assert result.startswith("moved to joints"), result
+        arm = driver.get_runtime_state()["robots"]["so101_001"]["arm"]
+        assert arm["joint_angles_rad"] == [0.1, -0.2, 0.3, 0.0, 0.0, 0.0]
+
+    def test_move_to_joints_wrong_length_returns_error(self, driver):
+        result = driver.execute_action("move_to_joints", {"joints": [0.0, 0.0, 0.0]})
+        assert result.startswith("error:"), result
+        assert "6-element" in result
+
+    def test_move_to_joints_non_numeric_returns_error(self, driver):
+        result = driver.execute_action(
+            "move_to_joints", {"joints": ["a", "b", "c", "d", "e", "f"]}
+        )
+        assert result.startswith("error:"), result
+
+
+class TestSO101DriverRealHardwareGating:
+    """Real-hardware mode rejects actions that require IK or direct motor commands
+    we don't have a safe default for. Driver is constructed with a fake bus so
+    these tests don't need physical hardware."""
+
+    @pytest.fixture
+    def driver_real(self, monkeypatch):
+        d = SO101Driver(mock=True)
+        d._mock = False
+        d._connected = True
+        return d
+
+    def test_move_to_pose_errors_on_real(self, driver_real):
+        result = driver_real.execute_action("move_to_pose", {"pose": [0.30, 0.0, 0.45]})
+        assert result.startswith("error:"), result
+        assert "move_to_joints" in result
+
+    def test_grasp_errors_on_real(self, driver_real):
+        driver_real.load_scene(_scene_with_bottle())
+        result = driver_real.execute_action("grasp", {"target_id": "bottle_02"})
+        assert result.startswith("error:"), result
+        assert "move_to_joints" in result
+
+    def test_release_errors_on_real(self, driver_real):
+        result = driver_real.execute_action("release", {})
+        assert result.startswith("error:"), result
+        assert "move_to_joints" in result
+
+    def test_gripper_open_errors_on_real(self, driver_real):
+        result = driver_real.execute_action("gripper_open", {})
+        assert result.startswith("error:"), result
+        assert "move_to_joints" in result
+
+    def test_gripper_close_errors_on_real(self, driver_real):
+        result = driver_real.execute_action("gripper_close", {})
+        assert result.startswith("error:"), result
+        assert "move_to_joints" in result
+
+    def test_home_works_on_real_with_fake_bus(self, driver_real):
+        class FakeBus:
+            def __init__(self):
+                self.writes = []
+            def sync_write(self, name, values):
+                self.writes.append((name, values))
+        driver_real._bus = FakeBus()
+        result = driver_real.execute_action("home", {})
+        assert result.startswith("home:"), result
+        assert driver_real._bus.writes == [
+            ("Goal_Position", {
+                "shoulder_pan": 0.0,
+                "shoulder_lift": -0.30,
+                "elbow_flex": 0.60,
+                "wrist_flex": 0.0,
+                "wrist_roll": 0.0,
+                "gripper": 0.0,
+            }),
+        ]
+
+    def test_move_to_joints_writes_targets_on_real(self, driver_real):
+        class FakeBus:
+            def __init__(self):
+                self.writes = []
+            def sync_write(self, name, values):
+                self.writes.append((name, values))
+        driver_real._bus = FakeBus()
+        result = driver_real.execute_action(
+            "move_to_joints", {"joints": [0.1, -0.2, 0.3, 0.4, -0.5, 0.6]}
+        )
+        assert result.startswith("moved to joints"), result
+        assert driver_real._bus.writes == [
+            ("Goal_Position", {
+                "shoulder_pan": 0.1,
+                "shoulder_lift": -0.2,
+                "elbow_flex": 0.3,
+                "wrist_flex": 0.4,
+                "wrist_roll": -0.5,
+                "gripper": 0.6,
+            }),
+        ]
+
+
+class TestSO101DriverHardwareConnection:
+    """Connection tests require lerobot installed and (optionally) hardware
+    on a port supplied via SO101_TEST_PORT env var."""
+
+    def test_connect_without_lerobot_raises_clear_error(self, monkeypatch):
+        import builtins
+        real_import = builtins.__import__
+
+        def fake_import(name, *args, **kwargs):
+            if name.startswith("lerobot"):
+                raise ImportError("lerobot not installed")
+            return real_import(name, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "__import__", fake_import)
+        with pytest.raises(ImportError, match=r"\[so101\]"):
             SO101Driver(mock=False)
+
+    def test_connect_without_calibration_file_raises(self, tmp_path):
+        pytest.importorskip("lerobot")
+        missing = tmp_path / "missing.json"
+        with pytest.raises(FileNotFoundError, match="calibration"):
+            SO101Driver(mock=False, calibration_path=missing)

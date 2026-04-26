@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import math
 from datetime import datetime, timezone
 from pathlib import Path
@@ -13,6 +14,27 @@ DEFAULT_HOME = [0.0, -0.30, 0.60, 0.0, 0.0, 0.0]
 REACH_ENVELOPE_M = 0.50
 SHOULDER_OFFSET_LOCAL = (0.0, 0.0, 0.35)
 
+# SO-101 follower joint order — matches lerobot calibration JSON keys.
+JOINT_NAMES = (
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll",
+    "gripper",
+)
+
+DEFAULT_CALIBRATION_PATH = (
+    Path.home()
+    / ".cache"
+    / "huggingface"
+    / "lerobot"
+    / "calibration"
+    / "robots"
+    / "so101_follower"
+    / "so101_follower.json"
+)
+
 
 class SO101Driver(BaseDriver):
     def __init__(
@@ -21,6 +43,7 @@ class SO101Driver(BaseDriver):
         mock: bool = True,
         robot_id: str = "so101_001",
         base_pose_world: tuple[float, float, float] = (0.0, 0.0, 0.0),
+        calibration_path: str | Path | None = None,
         **_kwargs: Any,
     ) -> None:
         self._port = port
@@ -33,14 +56,62 @@ class SO101Driver(BaseDriver):
         self._holding: str | None = None
         self._end_effector_world = self._compute_end_effector_world()
         self._bus = None
+        self._connected = False
+        self._calibration_path = (
+            Path(calibration_path) if calibration_path else DEFAULT_CALIBRATION_PATH
+        )
         if not mock:
             self._connect_hardware()
 
     def _connect_hardware(self) -> None:
-        raise NotImplementedError(
-            "Real SO-101 hardware path is not wired up yet. "
-            "Replace this with feetech / lerobot motor bus initialisation."
+        try:
+            from lerobot.motors import Motor, MotorCalibration, MotorNormMode
+            from lerobot.motors.feetech import FeetechMotorsBus
+        except ImportError as exc:
+            raise ImportError(
+                "Real SO-101 hardware mode requires lerobot. "
+                "Install the optional extra: pip install -e '.[so101]'"
+            ) from exc
+
+        if not self._calibration_path.exists():
+            raise FileNotFoundError(
+                f"SO-101 calibration not found at {self._calibration_path}. "
+                "Run solo-cli calibration (or lerobot-calibrate) first."
+            )
+
+        with open(self._calibration_path) as f:
+            calib_raw = json.load(f)
+
+        calibration = {
+            name: MotorCalibration(
+                id=int(entry["id"]),
+                drive_mode=int(entry["drive_mode"]),
+                homing_offset=int(entry["homing_offset"]),
+                range_min=int(entry["range_min"]),
+                range_max=int(entry["range_max"]),
+            )
+            for name, entry in calib_raw.items()
+        }
+
+        motors = {
+            name: Motor(
+                id=calibration[name].id,
+                model="sts3215",
+                norm_mode=MotorNormMode.RANGE_M100_100,
+            )
+            for name in JOINT_NAMES
+        }
+
+        self._bus = FeetechMotorsBus(
+            port=self._port,
+            motors=motors,
+            calibration=calibration,
         )
+        self._bus.connect()
+        self._connected = True
+
+        positions = self._bus.sync_read("Present_Position")
+        self._joint_angles = [float(positions[name]) for name in JOINT_NAMES]
 
     def get_profile_path(self) -> Path:
         return _PROFILES_DIR / "so101.md"
@@ -69,6 +140,12 @@ class SO101Driver(BaseDriver):
         return scene
 
     def get_runtime_state(self) -> dict[str, Any]:
+        if self._bus is not None and self._connected:
+            try:
+                live = self._bus.sync_read("Present_Position")
+                self._joint_angles = [float(live[name]) for name in JOINT_NAMES]
+            except Exception:
+                pass
         return {
             "robots": {
                 self.robot_id: {
@@ -83,12 +160,30 @@ class SO101Driver(BaseDriver):
             }
         }
 
+    def is_connected(self) -> bool:
+        return self._mock or self._connected
+
+    def close(self) -> None:
+        if self._bus is not None and self._connected:
+            try:
+                self._bus.disconnect()
+            finally:
+                self._bus = None
+                self._connected = False
+
     def _do_home(self, _params: dict) -> str:
         self._joint_angles = list(DEFAULT_HOME)
         self._end_effector_world = self._compute_end_effector_world()
+        if not self._mock:
+            self._write_motor_targets(self._joint_angles)
         return f"home: joint_angles={self._joint_angles}"
 
     def _do_move_to_pose(self, params: dict) -> str:
+        if not self._mock:
+            return (
+                "error: move_to_pose not supported on real SO-101 hardware "
+                "(no IK available); use 'move_to_joints' with explicit joint targets"
+            )
         pose = params.get("pose")
         if not isinstance(pose, (list, tuple)) or len(pose) != 3:
             return "error: 'pose' must be a 3-element list [x, y, z]"
@@ -96,11 +191,27 @@ class SO101Driver(BaseDriver):
             return f"error: pose {list(pose)} is outside reach envelope ({REACH_ENVELOPE_M} m)"
         self._joint_angles = self._inverse_kinematics(pose)
         self._end_effector_world = tuple(float(v) for v in pose)
-        if not self._mock:
-            self._write_motor_targets(self._joint_angles)
         return f"moved to {list(pose)}"
 
+    def _do_move_to_joints(self, params: dict) -> str:
+        joints = params.get("joints")
+        if not isinstance(joints, (list, tuple)) or len(joints) != 6:
+            return "error: 'joints' must be a 6-element list [j1..j6]"
+        try:
+            joints = [float(v) for v in joints]
+        except (TypeError, ValueError):
+            return "error: 'joints' values must be numeric"
+        self._joint_angles = list(joints)
+        if not self._mock:
+            self._write_motor_targets(joints)
+        return f"moved to joints {joints}"
+
     def _do_grasp(self, params: dict) -> str:
+        if not self._mock:
+            return (
+                "error: grasp not supported on real SO-101 hardware "
+                "(no IK available); use 'move_to_joints' to position the arm, then 'gripper_close'"
+            )
         target_id = params.get("target_id")
         if not target_id:
             return "error: 'target_id' is required"
@@ -121,6 +232,11 @@ class SO101Driver(BaseDriver):
         return f"grasped {target_id} at {list(pose)}"
 
     def _do_release(self, _params: dict) -> str:
+        if not self._mock:
+            return (
+                "error: release not supported on real SO-101 hardware; "
+                "use 'move_to_joints' to position the arm, then 'gripper_open'"
+            )
         if self._holding is None:
             return "error: nothing to release"
         released = self._holding
@@ -129,12 +245,22 @@ class SO101Driver(BaseDriver):
         return f"released {released}"
 
     def _do_gripper_open(self, _params: dict) -> str:
+        if not self._mock:
+            return (
+                "error: gripper_open not supported on real SO-101 hardware; "
+                "set the gripper joint via 'move_to_joints'"
+            )
         if self._holding is not None:
             return f"error: cannot open gripper while holding {self._holding!r}; use 'release' first"
         self._gripper_state = "open"
         return "gripper open"
 
     def _do_gripper_close(self, _params: dict) -> str:
+        if not self._mock:
+            return (
+                "error: gripper_close not supported on real SO-101 hardware; "
+                "set the gripper joint via 'move_to_joints'"
+            )
         self._gripper_state = "closed"
         return "gripper closed"
 
@@ -163,13 +289,17 @@ class SO101Driver(BaseDriver):
             return float(pos[0]), float(pos[1]), float(pos[2])
         return None
 
-    def _write_motor_targets(self, _joints: list[float]) -> None:
-        raise NotImplementedError("Hardware motor write not wired up.")
+    def _write_motor_targets(self, joints: list[float]) -> None:
+        if self._bus is None or not self._connected:
+            raise RuntimeError("SO-101 hardware bus is not connected")
+        targets = {name: float(value) for name, value in zip(JOINT_NAMES, joints)}
+        self._bus.sync_write("Goal_Position", targets)
 
 
 SO101Driver._handlers = {
     "home": SO101Driver._do_home,
     "move_to_pose": SO101Driver._do_move_to_pose,
+    "move_to_joints": SO101Driver._do_move_to_joints,
     "grasp": SO101Driver._do_grasp,
     "release": SO101Driver._do_release,
     "gripper_open": SO101Driver._do_gripper_open,
