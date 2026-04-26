@@ -39,3 +39,9 @@ If the user says “go to desk” / “走到桌子” and `EMBODIED.md` lists t
 `execute_robot_action` dispatches an action to `ACTION.md`; it does not mean the robot has finished. When the next planning step depends on completion, call `wait_for_robot_action` with the returned `action_id` and `robot_id`.
 
 In fleet mode, always pass `robot_id`. If `action_id` is omitted, the tool waits for the newest action in that robot's queue.
+
+## capture_and_describe_scene — camera frame to vision model
+
+Use `capture_and_describe_scene` when the next robot action depends on current visual context. It dispatches a HAL `capture_frame` action, waits for the watchdog to finish, sends the saved image to a vision-capable model, and writes the structured observation back into `ENVIRONMENT.md`.
+
+In fleet mode, pass `robot_id`. For Reachy Mini, ask targeted questions such as whether a customer is present, whether a mock ID card is visible, or whether the workspace looks safe before triggering gated physical actions.

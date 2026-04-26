@@ -29,6 +29,7 @@ from PhyAgentOS.agent.tools.scene_graph import SceneGraphQueryTool
 from PhyAgentOS.agent.tools.shell import ExecTool
 from PhyAgentOS.agent.tools.semantic_navigation import SemanticNavigationTool
 from PhyAgentOS.agent.tools.spawn import SpawnTool
+from PhyAgentOS.agent.tools.vision_observe import CaptureAndDescribeSceneTool
 from PhyAgentOS.agent.tools.web import WebFetchTool, WebSearchTool
 from PhyAgentOS.agent.tools.target_navigation import TargetNavigationTool
 from PhyAgentOS.bus.events import InboundMessage, OutboundMessage
@@ -158,6 +159,12 @@ class AgentLoop:
         self.tools.register(action_tool)
         self.tools.register(WaitForRobotActionTool(
             workspace=self.workspace,
+            registry=self.embodiment_registry,
+        ))
+        self.tools.register(CaptureAndDescribeSceneTool(
+            workspace=self.workspace,
+            provider=self.provider,
+            model=self.model,
             registry=self.embodiment_registry,
         ))
         self.tools.register(SceneGraphQueryTool(workspace=self.workspace))

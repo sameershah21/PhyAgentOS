@@ -63,6 +63,11 @@ Capture a camera frame for later perception:
 }
 ```
 
+For LLM-driven perception, prefer the agent tool `capture_and_describe_scene`
+instead of calling `capture_frame` directly. That tool captures one frame,
+passes the saved image to a vision-capable model, and writes the resulting
+observation into `ENVIRONMENT.md` for planning.
+
 ## Driver Configuration
 
 Preferred `--driver-config` keys:

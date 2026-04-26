@@ -72,6 +72,12 @@ def load_driver_config(path: Path | None) -> dict[str, object]:
 
 def _save_scene(driver, path: Path, scene: dict[str, dict], registry=None) -> None:
     existing = load_environment_doc(path)
+    existing_objects = existing.get("objects", {})
+    if isinstance(existing_objects, dict):
+        # Preserve side-loaded observations such as camera/vision outputs that
+        # are written by agent tools between watchdog ticks. Driver scene keys
+        # still win when the HAL reports an updated object.
+        scene = {**existing_objects, **scene}
     runtime_state = {}
     runtime_getter = getattr(driver, "get_runtime_state", None)
     if callable(runtime_getter):
