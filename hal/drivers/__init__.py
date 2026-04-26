@@ -41,6 +41,9 @@ DRIVER_REGISTRY: dict[str, str] = {
 
     # G1 Simulation 驱动 (Isaac Sim) - 人形机器人 locomotion
     "g1_simulation": "hal.drivers.g1_simulation_driver.G1SimulationDriver",  # Isaac Sim 仿真驱动
+
+    # SO-101 6-DoF arm (open-source LeRobot-compatible). Mock-first; real hardware path stubbed.
+    "so101": "hal.drivers.so101_driver.SO101Driver",
     # Future drivers — uncomment when implemented:
     # "desktop_pet": "hal.drivers.desktop_pet_driver.DesktopPetDriver",
     # "dobot_nova5": "hal.drivers.dobot_driver.DobotDriver",
