@@ -1,0 +1,37 @@
+{
+  "agents": {
+    "defaults": {
+      "workspace": "/tmp/pharmacy_mvp_wave/workspaces/shared",
+      "model": "openai-codex/gpt-5.3-codex",
+      "maxToolIterations": 40,
+      "contextWindowTokens": 65536,
+      "maxTokens": 4096,
+      "temperature": 0.1
+    }
+  },
+  "embodiments": {
+    "mode": "fleet",
+    "sharedWorkspace": "/tmp/pharmacy_mvp_wave/workspaces/shared",
+    "instances": [
+      {
+        "robotId": "reachy_frontdesk",
+        "driver": "reachy_mini",
+        "workspace": "/tmp/pharmacy_mvp_wave/workspaces/reachy_frontdesk",
+        "enabled": true,
+        "profileName": "reachy_mini",
+        "sharedEnvironment": "/tmp/pharmacy_mvp_wave/workspaces/shared/ENVIRONMENT.md"
+      },
+      {
+        "robotId": "so101_counter_arm",
+        "driver": "so101_greeting",
+        "workspace": "/tmp/pharmacy_mvp_wave/workspaces/so101_counter_arm",
+        "enabled": true,
+        "profileName": "so101_greeting_arm",
+        "sharedEnvironment": "/tmp/pharmacy_mvp_wave/workspaces/shared/ENVIRONMENT.md"
+      }
+    ]
+  },
+  "tools": {
+    "restrictToWorkspace": false
+  }
+}
