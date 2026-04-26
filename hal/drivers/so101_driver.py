@@ -108,6 +108,7 @@ class SO101Driver(BaseDriver):
             calibration=calibration,
         )
         self._bus.connect()
+        self._bus.enable_torque()
         self._connected = True
 
         positions = self._bus.sync_read("Present_Position")
