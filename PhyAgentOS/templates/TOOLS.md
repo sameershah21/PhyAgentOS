@@ -33,3 +33,9 @@ That process installs `EMBODIED.md` from the driver profile and polls `ACTION.md
 5. **`close`** when the session should tear down the sim.
 
 If the user says “go to desk” / “走到桌子” and `EMBODIED.md` lists these actions, call **`execute_robot_action`** with the steps above instead of asking whether they meant a robot.
+
+## wait_for_robot_action — HAL completion polling
+
+`execute_robot_action` dispatches an action to `ACTION.md`; it does not mean the robot has finished. When the next planning step depends on completion, call `wait_for_robot_action` with the returned `action_id` and `robot_id`.
+
+In fleet mode, always pass `robot_id`. If `action_id` is omitted, the tool waits for the newest action in that robot's queue.

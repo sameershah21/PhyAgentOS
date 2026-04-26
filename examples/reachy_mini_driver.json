@@ -1,0 +1,12 @@
+{
+  "robot_id": "reachy_mini_001",
+  "host": "reachy-mini.local",
+  "port": 8000,
+  "connection_mode": "auto",
+  "spawn_daemon": false,
+  "use_sim": false,
+  "timeout": 5.0,
+  "media_backend": "no_media",
+  "automatic_body_yaw": true,
+  "reconnect_policy": "manual"
+}

@@ -24,6 +24,7 @@ from PhyAgentOS.agent.tools.embodied import EmbodiedActionTool
 from PhyAgentOS.agent.tools.filesystem import EditFileTool, ListDirTool, ReadFileTool, WriteFileTool
 from PhyAgentOS.agent.tools.message import MessageTool
 from PhyAgentOS.agent.tools.registry import ToolRegistry
+from PhyAgentOS.agent.tools.robot_wait import WaitForRobotActionTool
 from PhyAgentOS.agent.tools.scene_graph import SceneGraphQueryTool
 from PhyAgentOS.agent.tools.shell import ExecTool
 from PhyAgentOS.agent.tools.semantic_navigation import SemanticNavigationTool
@@ -155,6 +156,10 @@ class AgentLoop:
             registry=self.embodiment_registry,
         )
         self.tools.register(action_tool)
+        self.tools.register(WaitForRobotActionTool(
+            workspace=self.workspace,
+            registry=self.embodiment_registry,
+        ))
         self.tools.register(SceneGraphQueryTool(workspace=self.workspace))
         self.tools.register(SemanticNavigationTool(
             workspace=self.workspace,

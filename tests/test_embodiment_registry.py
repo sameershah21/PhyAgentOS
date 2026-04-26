@@ -102,6 +102,7 @@ def test_embodied_action_tool_routes_action_to_robot_workspace(tmp_path: Path) -
     )
 
     assert "validated and dispatched" in result
+    assert "action_id=" in result
     assert not (shared / "ACTION.md").exists()
     action_doc = (tmp_path / "workspaces" / "go2_edu_001" / "ACTION.md").read_text(encoding="utf-8")
     assert "connect_robot" in action_doc

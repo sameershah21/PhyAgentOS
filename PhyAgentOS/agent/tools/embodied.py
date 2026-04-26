@@ -382,12 +382,13 @@ class EmbodiedActionTool(Tool):
                 "Wait for the watchdog to consume it before dispatching another action."
             )
         action_data = append_action(document, action_type=action_type, parameters=parameters)
+        action_id = action_data["actions"][-1].get("id", "unknown")
         action_file.parent.mkdir(parents=True, exist_ok=True)
         action_content = dump_action_document(action_data)
         action_file.write_text(action_content, encoding="utf-8")
 
         logger.info("Action validated and written to {}: {}", action_file, action_type)
-        return f"Action '{action_type}' validated and dispatched to hardware."
+        return f"Action '{action_type}' validated and dispatched to hardware. action_id={action_id}"
 
     @staticmethod
     def _load_action_document(action_file: Path) -> dict[str, Any] | None:
