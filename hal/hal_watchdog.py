@@ -72,6 +72,12 @@ def load_driver_config(path: Path | None) -> dict[str, object]:
 
 def _save_scene(driver, path: Path, scene: dict[str, dict], registry=None) -> None:
     existing = load_environment_doc(path)
+    existing_objects = existing.get("objects", {})
+    if isinstance(existing_objects, dict):
+        # Preserve side-loaded observations such as camera/vision outputs that
+        # are written by agent tools between watchdog ticks. Driver scene keys
+        # still win when the HAL reports an updated object.
+        scene = {**existing_objects, **scene}
     runtime_state = {}
     runtime_getter = getattr(driver, "get_runtime_state", None)
     if callable(runtime_getter):
@@ -120,16 +126,22 @@ def _resolve_watchdog_topology(
     workspace: Path | None,
     driver_name: str,
     robot_id: str | None,
+    config_path: Path | None = None,
 ):
     if not robot_id:
         if workspace is None:
             workspace = Path.home() / ".PhyAgentOS" / "workspace"
         return workspace, workspace / "ENVIRONMENT.md", driver_name, None
 
-    from PhyAgentOS.config.loader import load_config
+    from PhyAgentOS.config.loader import load_config, set_config_path
     from PhyAgentOS.embodiment_registry import EmbodimentRegistry
 
-    registry = EmbodimentRegistry(load_config())
+    if config_path is not None:
+        set_config_path(config_path)
+        config = load_config(config_path)
+    else:
+        config = load_config()
+    registry = EmbodimentRegistry(config)
     instance = registry.require_instance(robot_id)
     return instance.workspace, registry.resolve_environment_path(robot_id=robot_id), instance.driver, registry
 
@@ -254,6 +266,11 @@ def main() -> None:
         default=None,
         help="Path to a JSON object file that will be passed through to the selected driver as keyword args.",
     )
+    parser.add_argument(
+        "--config",
+        default=None,
+        help="Path to PhyAgentOS config.json. Useful for fleet mode with --robot-id.",
+    )
     args = parser.parse_args()
 
     if args.gui and args.vnc:
@@ -262,6 +279,10 @@ def main() -> None:
 
     workspace = Path(args.workspace).expanduser().resolve() if args.workspace else None
     driver_config_path = Path(args.driver_config).expanduser().resolve() if args.driver_config else None
+    config_path = Path(args.config).expanduser().resolve() if args.config else None
+    if config_path is not None and not config_path.exists():
+        print(f"Error: config file not found: {config_path}", file=sys.stderr)
+        sys.exit(1)
     try:
         driver_kwargs = load_driver_config(driver_config_path)
     except (FileNotFoundError, ValueError) as exc:
@@ -282,6 +303,7 @@ def main() -> None:
         workspace,
         args.driver,
         args.robot_id,
+        config_path=config_path,
     )
 
     if not robot_workspace.exists():

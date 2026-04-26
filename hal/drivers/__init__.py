@@ -28,6 +28,8 @@ DRIVER_REGISTRY: dict[str, str] = {
     "multi_robot_simulation": "hal.drivers.multi_robot_simulation_driver.MultiRobotSimulationDriver",
     "go2_edu":     "hal.drivers.go2_driver.Go2Driver",
     "xlerobot_2wheels_remote": "hal.drivers.xlerobot_2wheels_remote_driver.XLerobot2WheelsRemoteDriver",
+    "reachy_mini": "hal.drivers.reachy_mini_driver.ReachyMiniDriver",
+    "so101_greeting": "hal.drivers.so101_gesture_driver.SO101GestureDriver",
     "pipergo2_manipulation": "hal.drivers.pipergo2_manipulation_driver.PiperGo2ManipulationDriver",
     # Franka Research 3 驱动
     # Franka Research 3 Driver
@@ -38,6 +40,9 @@ DRIVER_REGISTRY: dict[str, str] = {
 
     # G1 Simulation 驱动 (Isaac Sim) - 人形机器人 locomotion
     "g1_simulation": "hal.drivers.g1_simulation_driver.G1SimulationDriver",  # Isaac Sim 仿真驱动
+
+    # SO-101 6-DoF arm (open-source LeRobot-compatible). Mock-first; real hardware path stubbed.
+    "so101": "hal.drivers.so101_driver.SO101Driver",
     # Future drivers — uncomment when implemented:
     # "desktop_pet": "hal.drivers.desktop_pet_driver.DesktopPetDriver",
     # "dobot_nova5": "hal.drivers.dobot_driver.DobotDriver",

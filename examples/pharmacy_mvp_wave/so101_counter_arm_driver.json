@@ -1,0 +1,6 @@
+{
+  "robot_id": "so101_counter_arm",
+  "workspace": "/tmp/pharmacy_mvp_wave/workspaces/so101_counter_arm",
+  "identity_path": "/tmp/pharmacy_mvp_wave/workspaces/shared/IDENTITY.md",
+  "backend": "dry_run"
+}

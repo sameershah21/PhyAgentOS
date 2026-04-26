@@ -1,0 +1,9 @@
+{
+  "robot_id": "reachy_frontdesk",
+  "host": "127.0.0.1",
+  "port": 8000,
+  "connection_mode": "localhost_only",
+  "spawn_daemon": false,
+  "media_backend": "no_media",
+  "timeout": 8.0
+}

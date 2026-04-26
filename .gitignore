@@ -4,6 +4,7 @@
 *.pyc
 dist/
 build/
+build*.log
 *.egg-info/
 *.egg
 *.pyc
@@ -14,6 +15,7 @@ build/
 *.pywz
 *.pyzz
 .venv/
+.venv-*/
 venv/
 __pycache__/
 poetry.lock
